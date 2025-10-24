@@ -16,11 +16,9 @@ const TITLE_ANIMATION_DURATION = 0.6;
 const CONTAINER_ANIMATION_DURATION = 0.8;
 const CARD_ANIMATION_DURATION = 0.6;
 
-// 동영상 링크 (실제 동영상 URL로 교체 필요)
-const GUIDE_VIDEO_URL = "https://youtu.be/your-video-link";
-
 // 교재 시리즈 데이터 타입
 type BookData = {
+  id: string;
   title: string;
   subject: string;
   series: string;
@@ -28,127 +26,29 @@ type BookData = {
   link: string;
 };
 
-const gridConcept: BookData[] = [
-  {
-    title: "물리학 GRID 개념편",
-    subject: "물리학",
-    series: "GRID 개념편",
-    front: "/images/grid_kinetic_front.jpg",
-    link: "https://smartstore.naver.com/veradi",
-  },
-  {
-    title: "화학 GRID 개념편",
-    subject: "화학",
-    series: "GRID 개념편",
-    front: "/images/grid_helios_front.jpg",
-    link: "https://smartstore.naver.com/veradi",
-  },
-  {
-    title: "생명과학 GRID 개념편",
-    subject: "생명과학",
-    series: "GRID 개념편",
-    front: "/images/grid_bioneer_front.jpg",
-    link: "https://smartstore.naver.com/veradi",
-  },
-  {
-    title: "지구과학 GRID 개념편",
-    subject: "지구과학",
-    series: "GRID 개념편",
-    front: "/images/grid_orca_front.jpg",
-    link: "https://smartstore.naver.com/veradi",
-  },
-];
+type PublicationGuide = {
+  main_title: string;
+  hero_title: string;
+  video_url: string | null;
+};
 
-const gridSol: BookData[] = [
-  {
-    title: "물리학 GRID 필수기출편",
-    subject: "물리학",
-    series: "GRID 필수기출편",
-    front: "/images/grid_kinetic_sol_front.jpg",
-    link: "https://smartstore.naver.com/veradi",
-  },
-  {
-    title: "화학 GRID 필수기출편",
-    subject: "화학",
-    series: "GRID 필수기출편",
-    front: "/images/grid_helios_sol_front.jpg",
-    link: "https://smartstore.naver.com/veradi",
-  },
-  {
-    title: "생명과학 GRID 필수기출편",
-    subject: "생명과학",
-    series: "GRID 필수기출편",
-    front: "/images/grid_bioneer_sol_front.jpg",
-    link: "https://smartstore.naver.com/veradi",
-  },
-  {
-    title: "지구과학 GRID 필수기출편",
-    subject: "지구과학",
-    series: "GRID 필수기출편",
-    front: "/images/grid_orca_sol_front.jpg",
-    link: "https://smartstore.naver.com/veradi",
-  },
-];
-
-const gridN: BookData[] = [
-  {
-    title: "물리학 GRID N제",
-    subject: "물리학",
-    series: "GRID N제",
-    front: null,
-    link: "https://smartstore.naver.com/veradi",
-  },
-  {
-    title: "화학 GRID N제",
-    subject: "화학",
-    series: "GRID N제",
-    front: null,
-    link: "https://smartstore.naver.com/veradi",
-  },
-  {
-    title: "생명과학 GRID N제",
-    subject: "생명과학",
-    series: "GRID N제",
-    front: null,
-    link: "https://smartstore.naver.com/veradi",
-  },
-  {
-    title: "지구과학 GRID N제",
-    subject: "지구과학",
-    series: "GRID N제",
-    front: null,
-    link: "https://smartstore.naver.com/veradi",
-  },
-];
-
-const mathMock: BookData[] = [
-  {
-    title: "수학 모의고사 시리즈",
-    subject: "수학",
-    series: "모의고사",
-    front: null,
-    link: "https://smartstore.naver.com/veradi",
-  },
-];
-
-const scienceMock: BookData[] = [
-  {
-    title: "과학탐구 모의고사 시리즈",
-    subject: "과학탐구",
-    series: "모의고사",
-    front: null,
-    link: "https://smartstore.naver.com/veradi",
-  },
-];
+type PublicationSection = {
+  category: string;
+  title: string;
+  guide_url: string | null;
+  use_subjects_background: boolean;
+};
 
 // 교재 섹션 컴포넌트
 function BookSeriesSection({ 
   title, 
   books,
+  guideUrl,
   useSubjectsBackground = false
 }: { 
   title: string; 
   books: BookData[];
+  guideUrl?: string | null;
   useSubjectsBackground?: boolean;
 }) {
   const [isClient, setIsClient] = useState(false);
@@ -160,6 +60,8 @@ function BookSeriesSection({
   useEffect(() => {
     setIsClient(true);
   }, []);
+  
+  if (books.length === 0) return null;
 
   // 배경 스타일 선택
   const backgroundStyle = useSubjectsBackground ? {
@@ -199,17 +101,19 @@ function BookSeriesSection({
           </h2>
           
           {/* 더 알아보기 링크 */}
-          <a
-            href={GUIDE_VIDEO_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sky-600 hover:text-sky-700 text-sm sm:text-base font-medium whitespace-nowrap flex items-center gap-1 group transition-colors"
-          >
-            더 알아보기
-            <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </a>
+          {guideUrl && (
+            <a
+              href={guideUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sky-600 hover:text-sky-700 text-sm sm:text-base font-medium whitespace-nowrap flex items-center gap-1 group transition-colors"
+            >
+              더 알아보기
+              <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </a>
+          )}
         </motion.div>
 
         {/* 화살표 버튼 */}
@@ -261,7 +165,7 @@ function BookSeriesSection({
         >
           {books.map((book, idx) => (
             <motion.div
-              key={book.title}
+              key={book.id}
               initial={isMobile ? { opacity: 1 } : { opacity: 0, x: 30 }}
               whileInView={isMobile ? { opacity: 1 } : { opacity: 1, x: 0 }}
               viewport={{ once: true, amount: 0.3 }}
@@ -353,10 +257,78 @@ function BookSeriesSection({
 
 export default function Publications() {
   const isMobile = useMobileDetect();
+  const [guide, setGuide] = useState<PublicationGuide | null>(null);
+  const [sections, setSections] = useState<PublicationSection[]>([]);
+  const [booksByCategory, setBooksByCategory] = useState<Record<string, BookData[]>>({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    
+    // 데이터 로드
+    const fetchData = async () => {
+      try {
+        // 가이드 섹션 로드
+        const guideRes = await fetch('/api/publication-guide');
+        if (guideRes.ok) {
+          const guideData = await guideRes.json();
+          setGuide(guideData);
+        }
+
+        // 섹션 설정 로드
+        const sectionsRes = await fetch('/api/publication-sections');
+        if (sectionsRes.ok) {
+          const sectionsData = await sectionsRes.json();
+          if (Array.isArray(sectionsData)) {
+            setSections(sectionsData);
+          }
+        }
+
+        // 교재 로드
+        const booksRes = await fetch('/api/books?type=publication');
+        if (booksRes.ok) {
+          const booksData = await booksRes.json();
+          if (Array.isArray(booksData)) {
+            // 카테고리별로 그룹화
+            const grouped: Record<string, BookData[]> = {};
+            booksData.forEach((book: any) => {
+              const category = book.category || 'uncategorized';
+              if (!grouped[category]) {
+                grouped[category] = [];
+              }
+              grouped[category].push({
+                id: book.id,
+                title: book.title,
+                subject: book.subject,
+                series: book.series || '',
+                front: book.front_image_url,
+                link: book.purchase_link || '#',
+              });
+            });
+            setBooksByCategory(grouped);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching publications data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
+
+  if (loading) {
+    return (
+      <main className="bg-white text-gray-900 min-h-screen">
+        <Navbar />
+        <div className="flex items-center justify-center min-h-screen">
+          <p className="text-gray-600">로딩 중...</p>
+        </div>
+        <Footer />
+      </main>
+    );
+  }
 
   return (
     <main className="bg-white text-gray-900 min-h-screen">
@@ -373,7 +345,7 @@ export default function Publications() {
             className="text-left mb-8 sm:mb-12"
           >
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 tracking-tight leading-tight">
-              완벽활용가이드
+              {guide?.main_title || '완벽활용가이드'}
             </h1>
           </motion.div>
 
@@ -414,24 +386,26 @@ export default function Publications() {
                     className="space-y-5 sm:space-y-6 text-center"
                   >
                     <div>
-                      <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
-                        VERADI 교재,<br />
-                        제대로 활용하기
-                      </h2>
+                      <h2 
+                        className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight"
+                        dangerouslySetInnerHTML={{ __html: guide?.hero_title || 'VERADI 교재,<br />제대로 활용하기' }}
+                      />
                     </div>
 
                     {/* 동영상 보기 버튼 */}
-                    <div className="flex justify-center">
-                      <a
-                        href={GUIDE_VIDEO_URL}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-sky-600 hover:bg-sky-700 text-white font-semibold rounded-full transition-all duration-300 hover:shadow-xl hover:scale-105 group"
-                      >
-                        <Play className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" />
-                        <span className="text-sm sm:text-base">동영상 보기</span>
-                      </a>
-                    </div>
+                    {guide?.video_url && (
+                      <div className="flex justify-center">
+                        <a
+                          href={guide.video_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-sky-600 hover:bg-sky-700 text-white font-semibold rounded-full transition-all duration-300 hover:shadow-xl hover:scale-105 group"
+                        >
+                          <Play className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" />
+                          <span className="text-sm sm:text-base">동영상 보기</span>
+                        </a>
+                      </div>
+                    )}
                   </motion.div>
                 </div>
               </div>
@@ -440,15 +414,16 @@ export default function Publications() {
         </div>
       </section>
 
-      {/* 각 교재 시리즈 섹션 */}
-      {/* GRID 시리즈 - 모두 그리드 패턴 배경으로 통일 */}
-      <BookSeriesSection title="GRID 개념편" books={gridConcept} />
-      <BookSeriesSection title="GRID 필수기출편" books={gridSol} />
-      <BookSeriesSection title="GRID N제" books={gridN} />
-      
-      {/* 모의고사 시리즈 - 블루 그라데이션 배경 */}
-      <BookSeriesSection title="수학 모의고사" books={mathMock} useSubjectsBackground={true} />
-      <BookSeriesSection title="과학탐구 모의고사" books={scienceMock} useSubjectsBackground={true} />
+      {/* 각 교재 시리즈 섹션 - 동적으로 생성 */}
+      {sections.map((section) => (
+        <BookSeriesSection
+          key={section.category}
+          title={section.title}
+          books={booksByCategory[section.category] || []}
+          guideUrl={section.guide_url}
+          useSubjectsBackground={section.use_subjects_background}
+        />
+      ))}
 
       <Footer />
     </main>

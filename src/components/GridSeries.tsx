@@ -11,35 +11,19 @@ import { useMobileDetect } from "@/hooks/useMobileDetect";
 const SCROLL_AMOUNT_RATIO = 0.4;
 const CARD_HOVER_SCALE = 1.03;
 
-const subjects = [
-  {
-    title: "물리학",
-    main: "/images/grid_kinetic_front.jpg",
-    sub: "/images/grid_kinetic_sol_front.jpg",
-    link: "https://example.com/kinetic", // 실제 구매 링크로 변경 필요
-  },
-  {
-    title: "화학",
-    main: "/images/grid_helios_front.jpg",
-    sub: "/images/grid_helios_sol_front.jpg",
-    link: "https://example.com/helios",
-  },
-  {
-    title: "생명과학",
-    main: "/images/grid_bioneer_front.jpg",
-    sub: "/images/grid_bioneer_sol_front.jpg",
-    link: "https://example.com/bioneer",
-  },
-  {
-    title: "지구과학",
-    main: "/images/grid_orca_front.jpg",
-    sub: "/images/grid_orca_sol_front.jpg",
-    link: "https://example.com/orca",
-  },
-];
+type GridBook = {
+  id: string;
+  title: string;
+  subject: string;
+  main_image_url: string | null;
+  sub_image_url: string | null;
+  purchase_link: string | null;
+};
 
 export default function GridSeries() {
   const [isClient, setIsClient] = useState(false);
+  const [subjects, setSubjects] = useState<GridBook[]>([]);
+  const [loading, setLoading] = useState(true);
   const isMobile = useMobileDetect();
   const { scrollRef, canScrollLeft, canScrollRight, scroll } = useHorizontalScroll({
     scrollAmountRatio: SCROLL_AMOUNT_RATIO,
@@ -47,6 +31,25 @@ export default function GridSeries() {
 
   useEffect(() => {
     setIsClient(true);
+    
+    // API에서 GRID 교재 가져오기
+    const fetchGridBooks = async () => {
+      try {
+        const response = await fetch('/api/books?type=grid');
+        if (response.ok) {
+          const data = await response.json();
+          if (Array.isArray(data)) {
+            setSubjects(data);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching grid books:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGridBooks();
   }, []);
 
   return (
@@ -107,89 +110,107 @@ export default function GridSeries() {
         </div>
 
         {/* 카드 컨테이너 */}
-        <motion.div
-          ref={scrollRef}
-          initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 50 }}
-          whileInView={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-50px", amount: 0.2 }}
-          transition={{ duration: isMobile ? 0 : 0.8, ease: "easeOut" }}
-          className="flex gap-6 md:gap-8 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-8 hide-scrollbar"
-          style={{ willChange: 'transform' }}
-        >
-          {subjects.map((subject, idx) => (
-            <motion.div
-              key={subject.title}
-              initial={isMobile ? { opacity: 1 } : { opacity: 0, x: 30 }}
-              whileInView={isMobile ? { opacity: 1 } : { opacity: 1, x: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ 
-                duration: isMobile ? 0 : 0.5, 
-                delay: isMobile ? 0 : idx * 0.08,
-                ease: "easeOut" 
-              }}
-              whileHover={isMobile ? {} : { scale: CARD_HOVER_SCALE }}
-              className={`relative flex-shrink-0 w-[310px] sm:w-[410px] md:w-[510px] lg:w-[580px] xl:w-[630px] h-[280px] sm:h-[320px] md:h-[360px] lg:h-[440px] xl:h-[480px] bg-white rounded-3xl shadow-lg border border-gray-100 snap-center overflow-visible ${isMobile ? '' : 'hover:shadow-2xl transition-all duration-500'}`}
-              style={{ willChange: 'transform', backfaceVisibility: 'hidden' }}
-            >
-              {/* 상단 텍스트 영역 */}
-              <div className="pt-4 sm:pt-5 md:pt-6 lg:pt-7 pb-0 text-center">
-                <h3 className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-900 mb-1">
-                  {subject.title}
-                </h3>
-              </div>
-
-              {/* 교재 2권 */}
-              <a
-                href={subject.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`group/books h-[75%] mt-2 sm:mt-3 md:mt-4 flex items-center justify-center gap-3 sm:gap-4 md:gap-5 relative overflow-visible cursor-pointer ${isMobile ? 'pointer-events-auto' : ''}`}
+        {loading ? (
+          <div className="flex justify-center items-center py-20">
+            <p className="text-gray-500">로딩 중...</p>
+          </div>
+        ) : subjects.length === 0 ? (
+          <div className="flex justify-center items-center py-20">
+            <p className="text-gray-500">등록된 교재가 없습니다</p>
+          </div>
+        ) : (
+          <motion.div
+            ref={scrollRef}
+            initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 50 }}
+            whileInView={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px", amount: 0.2 }}
+            transition={{ duration: isMobile ? 0 : 0.8, ease: "easeOut" }}
+            className="flex gap-6 md:gap-8 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-8 hide-scrollbar"
+            style={{ willChange: 'transform' }}
+          >
+            {subjects.map((subject, idx) => (
+              <motion.div
+                key={subject.id}
+                initial={isMobile ? { opacity: 1 } : { opacity: 0, x: 30 }}
+                whileInView={isMobile ? { opacity: 1 } : { opacity: 1, x: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ 
+                  duration: isMobile ? 0 : 0.5, 
+                  delay: isMobile ? 0 : idx * 0.08,
+                  ease: "easeOut" 
+                }}
+                whileHover={isMobile ? {} : { scale: CARD_HOVER_SCALE }}
+                className={`relative flex-shrink-0 w-[310px] sm:w-[410px] md:w-[510px] lg:w-[580px] xl:w-[630px] h-[280px] sm:h-[320px] md:h-[360px] lg:h-[440px] xl:h-[480px] bg-white rounded-3xl shadow-lg border border-gray-100 snap-center overflow-visible ${isMobile ? '' : 'hover:shadow-2xl transition-all duration-500'}`}
+                style={{ willChange: 'transform', backfaceVisibility: 'hidden' }}
               >
-                {/* 문제집 */}
-                <div className={`relative w-[130px] sm:w-[160px] md:w-[190px] lg:w-[220px] xl:w-[240px] h-[180px] sm:h-[220px] md:h-[260px] lg:h-[320px] xl:h-[350px] overflow-hidden shadow-[0_25px_50px_rgba(0,0,0,0.35)] bg-white border border-gray-200 ${isMobile ? '' : 'group-hover/books:shadow-[0_30px_60px_rgba(0,0,0,0.45)] transition-all duration-300 group-hover/books:scale-105'}`}
-                  style={{ willChange: 'transform', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}
+                {/* 상단 텍스트 영역 */}
+                <div className="pt-4 sm:pt-5 md:pt-6 lg:pt-7 pb-0 text-center">
+                  <h3 className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-900 mb-1">
+                    {subject.subject}
+                  </h3>
+                </div>
+
+                {/* 교재 2권 */}
+                <a
+                  href={subject.purchase_link || '#'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`group/books h-[75%] mt-2 sm:mt-3 md:mt-4 flex items-center justify-center gap-3 sm:gap-4 md:gap-5 relative overflow-visible cursor-pointer ${isMobile ? 'pointer-events-auto' : ''}`}
                 >
-                  <Image
-                    src={subject.main}
-                    alt={`${subject.title} 문제집`}
-                    fill
-                    sizes="(max-width: 640px) 130px, (max-width: 768px) 160px, (max-width: 1024px) 190px, (max-width: 1280px) 220px, 240px"
-                    priority={idx === 0}
-                    className="object-cover"
-                    quality={85}
-                    loading={idx === 0 ? "eager" : "lazy"}
-                  />
-                </div>
+                  {/* 문제집 */}
+                  {subject.main_image_url && (
+                    <div className={`relative w-[130px] sm:w-[160px] md:w-[190px] lg:w-[220px] xl:w-[240px] h-[180px] sm:h-[220px] md:h-[260px] lg:h-[320px] xl:h-[350px] overflow-hidden shadow-[0_25px_50px_rgba(0,0,0,0.35)] bg-white border border-gray-200 ${isMobile ? '' : 'group-hover/books:shadow-[0_30px_60px_rgba(0,0,0,0.45)] transition-all duration-300 group-hover/books:scale-105'}`}
+                      style={{ willChange: 'transform', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}
+                    >
+                      <Image
+                        src={subject.main_image_url}
+                        alt={`${subject.subject} 문제집`}
+                        fill
+                        sizes="(max-width: 640px) 130px, (max-width: 768px) 160px, (max-width: 1024px) 190px, (max-width: 1280px) 220px, 240px"
+                        priority={idx === 0}
+                        className="object-cover"
+                        quality={85}
+                        loading={idx === 0 ? "eager" : "lazy"}
+                      />
+                    </div>
+                  )}
 
-                {/* 구분선 */}
-                <div className="w-[1px] h-[180px] sm:h-[220px] md:h-[260px] lg:h-[320px] xl:h-[350px] bg-gray-200" />
+                  {/* 구분선 */}
+                  {subject.main_image_url && subject.sub_image_url && (
+                    <div className="w-[1px] h-[180px] sm:h-[220px] md:h-[260px] lg:h-[320px] xl:h-[350px] bg-gray-200" />
+                  )}
 
-                {/* 해설집 */}
-                <div className={`relative w-[130px] sm:w-[160px] md:w-[190px] lg:w-[220px] xl:w-[240px] h-[180px] sm:h-[220px] md:h-[260px] lg:h-[320px] xl:h-[350px] overflow-hidden shadow-[0_25px_50px_rgba(0,0,0,0.3)] bg-white border border-gray-200 ${isMobile ? '' : 'group-hover/books:shadow-[0_30px_60px_rgba(0,0,0,0.4)] transition-all duration-300 group-hover/books:scale-105'}`}
-                  style={{ willChange: 'transform', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}
-                >
-                  <Image
-                    src={subject.sub}
-                    alt={`${subject.title} 해설집`}
-                    fill
-                    sizes="(max-width: 640px) 130px, (max-width: 768px) 160px, (max-width: 1024px) 190px, (max-width: 1280px) 220px, 240px"
-                    priority={idx === 0}
-                    className="object-cover"
-                    quality={85}
-                    loading={idx === 0 ? "eager" : "lazy"}
-                  />
-                </div>
+                  {/* 해설집 */}
+                  {subject.sub_image_url && (
+                    <div className={`relative w-[130px] sm:w-[160px] md:w-[190px] lg:w-[220px] xl:w-[240px] h-[180px] sm:h-[220px] md:h-[260px] lg:h-[320px] xl:h-[350px] overflow-hidden shadow-[0_25px_50px_rgba(0,0,0,0.3)] bg-white border border-gray-200 ${isMobile ? '' : 'group-hover/books:shadow-[0_30px_60px_rgba(0,0,0,0.4)] transition-all duration-300 group-hover/books:scale-105'}`}
+                      style={{ willChange: 'transform', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}
+                    >
+                      <Image
+                        src={subject.sub_image_url}
+                        alt={`${subject.subject} 해설집`}
+                        fill
+                        sizes="(max-width: 640px) 130px, (max-width: 768px) 160px, (max-width: 1024px) 190px, (max-width: 1280px) 220px, 240px"
+                        priority={idx === 0}
+                        className="object-cover"
+                        quality={85}
+                        loading={idx === 0 ? "eager" : "lazy"}
+                      />
+                    </div>
+                  )}
 
-                {/* 가운데 구매하기 버튼 */}
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <span className="opacity-0 group-hover/books:opacity-80 transition-all duration-300 bg-white/90 backdrop-blur-sm text-gray-800 px-4 sm:px-6 py-2 sm:py-3 rounded-full text-sm sm:text-base font-semibold shadow-xl transform group-hover/books:scale-110 pointer-events-auto border border-gray-200">
-                    구매하기
-                  </span>
-                </div>
-              </a>
-            </motion.div>
-          ))}
-        </motion.div>
+                  {/* 가운데 구매하기 버튼 */}
+                  {subject.purchase_link && (
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <span className="opacity-0 group-hover/books:opacity-80 transition-all duration-300 bg-white/90 backdrop-blur-sm text-gray-800 px-4 sm:px-6 py-2 sm:py-3 rounded-full text-sm sm:text-base font-semibold shadow-xl transform group-hover/books:scale-110 pointer-events-auto border border-gray-200">
+                        구매하기
+                      </span>
+                    </div>
+                  )}
+                </a>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
 
         {/* 섹션 하단 버튼 */}
         <motion.div

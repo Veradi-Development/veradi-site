@@ -2,45 +2,15 @@
 
 import { motion } from "framer-motion";
 import { Quote } from "lucide-react";
+import { useState, useEffect } from "react";
 
-const testimonials = [
-  {
-    name: "김서연",
-    school: "대원외고 2학년",
-    content: "이 책을 이제 알았다는 것이 가장 아쉽습니다.",
-    rating: 5
-  },
-  {
-    name: "박준혁",
-    school: "한영외고 3학년",
-    content: "",
-    rating: 5
-  },
-  {
-    name: "이지민",
-    school: "서울과학고 2학년",
-    content: "",
-    rating: 5
-  },
-  {
-    name: "최민준",
-    school: "하나고 3학년",
-    content: "",
-    rating: 5
-  },
-  {
-    name: "정수아",
-    school: "민사고 2학년",
-    content: "",
-    rating: 5
-  },
-  {
-    name: "강태윤",
-    school: "경기과학고 3학년",
-    content: "",
-    rating: 5
-  }
-];
+type Testimonial = {
+  id: string;
+  name: string;
+  school: string;
+  content: string;
+  rating: number;
+};
 
 // 애니메이션 상수
 const TITLE_ANIMATION_DURATION = 0.6;
@@ -48,6 +18,29 @@ const CARD_ANIMATION_DURATION = 0.5;
 const CARD_ANIMATION_DELAY = 0.1;
 
 export default function Testimonials() {
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // API에서 후기 가져오기
+    const fetchTestimonials = async () => {
+      try {
+        const response = await fetch('/api/testimonials');
+        if (response.ok) {
+          const data = await response.json();
+          if (Array.isArray(data)) {
+            setTestimonials(data);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching testimonials:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTestimonials();
+  }, []);
   return (
     <section className="relative bg-gradient-to-b from-blue-50 via-white to-blue-50/50 py-20 sm:py-28 md:py-36 px-4 sm:px-6 overflow-hidden">
       {/* 배경 장식 */}
@@ -82,11 +75,20 @@ export default function Testimonials() {
         </motion.div>
 
         {/* 후기 슬라이더 (모바일) / 그리드 (데스크톱) */}
-        <div className="relative">
-          {/* 모바일: 가로 스크롤 */}
-          <div className="md:hidden overflow-x-auto scrollbar-hide -mx-4 px-4">
-            <div className="flex gap-4 pb-4">
-              {testimonials.map((testimonial, idx) => (
+        {loading ? (
+          <div className="flex justify-center items-center py-20">
+            <p className="text-gray-500">로딩 중...</p>
+          </div>
+        ) : testimonials.length === 0 ? (
+          <div className="flex justify-center items-center py-20">
+            <p className="text-gray-500">등록된 후기가 없습니다</p>
+          </div>
+        ) : (
+          <div className="relative">
+            {/* 모바일: 가로 스크롤 */}
+            <div className="md:hidden overflow-x-auto scrollbar-hide -mx-4 px-4">
+              <div className="flex gap-4 pb-4">
+                {testimonials.map((testimonial, idx) => (
                 <motion.div
                   key={testimonial.name}
                   initial={{ opacity: 0, x: 50 }}
@@ -183,10 +185,11 @@ export default function Testimonials() {
                     {testimonial.school}
                   </p>
                 </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* 하단 문구 */}
         <motion.div
