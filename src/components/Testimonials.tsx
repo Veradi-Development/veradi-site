@@ -1,0 +1,207 @@
+"use client";
+
+import { motion } from "framer-motion";
+import { Quote } from "lucide-react";
+
+const testimonials = [
+  {
+    name: "김서연",
+    school: "대원외고 2학년",
+    content: "이 책을 이제 알았다는 것이 가장 아쉽습니다.",
+    rating: 5
+  },
+  {
+    name: "박준혁",
+    school: "한영외고 3학년",
+    content: "",
+    rating: 5
+  },
+  {
+    name: "이지민",
+    school: "서울과학고 2학년",
+    content: "",
+    rating: 5
+  },
+  {
+    name: "최민준",
+    school: "하나고 3학년",
+    content: "",
+    rating: 5
+  },
+  {
+    name: "정수아",
+    school: "민사고 2학년",
+    content: "",
+    rating: 5
+  },
+  {
+    name: "강태윤",
+    school: "경기과학고 3학년",
+    content: "",
+    rating: 5
+  }
+];
+
+// 애니메이션 상수
+const TITLE_ANIMATION_DURATION = 0.6;
+const CARD_ANIMATION_DURATION = 0.5;
+const CARD_ANIMATION_DELAY = 0.1;
+
+export default function Testimonials() {
+  return (
+    <section className="relative bg-gradient-to-b from-blue-50 via-white to-blue-50/50 py-20 sm:py-28 md:py-36 px-4 sm:px-6 overflow-hidden">
+      {/* 배경 장식 */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div 
+          className="absolute top-10 left-10 w-96 h-96 rounded-full blur-3xl opacity-20"
+          style={{ background: 'radial-gradient(circle, rgba(56, 189, 248, 0.4) 0%, transparent 70%)' }}
+        />
+        <div 
+          className="absolute bottom-10 right-10 w-96 h-96 rounded-full blur-3xl opacity-20"
+          style={{ background: 'radial-gradient(circle, rgba(14, 165, 233, 0.4) 0%, transparent 70%)' }}
+        />
+      </div>
+
+      <div className="max-w-7xl mx-auto relative z-10">
+        {/* 섹션 제목 */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: TITLE_ANIMATION_DURATION, ease: "easeOut" }}
+          className="text-center mb-16 sm:mb-20"
+        >
+          <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-4">
+            <span className="bg-gradient-to-r from-sky-600 to-blue-600 bg-clip-text text-transparent">
+              학생 후기
+            </span>
+          </h2>
+          <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
+            VERADI와 함께한 학생들의 진솔한 이야기
+          </p>
+        </motion.div>
+
+        {/* 후기 슬라이더 (모바일) / 그리드 (데스크톱) */}
+        <div className="relative">
+          {/* 모바일: 가로 스크롤 */}
+          <div className="md:hidden overflow-x-auto scrollbar-hide -mx-4 px-4">
+            <div className="flex gap-4 pb-4">
+              {testimonials.map((testimonial, idx) => (
+                <motion.div
+                  key={testimonial.name}
+                  initial={{ opacity: 0, x: 50 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ 
+                    duration: CARD_ANIMATION_DURATION, 
+                    delay: idx * 0.05,
+                    ease: "easeOut" 
+                  }}
+                  className="relative bg-white rounded-2xl p-6 shadow-lg border border-gray-100 flex-shrink-0 w-[85vw] max-w-[340px]"
+                >
+                  {/* 따옴표 아이콘 */}
+                  <div className="absolute top-4 right-4 text-sky-200">
+                    <Quote className="w-10 h-10" />
+                  </div>
+
+                  {/* 별점 */}
+                  <div className="flex gap-1 mb-3">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <svg
+                        key={i}
+                        className="w-5 h-5 text-yellow-400 fill-current"
+                        viewBox="0 0 20 20"
+                      >
+                        <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                      </svg>
+                    ))}
+                  </div>
+
+                  {/* 후기 내용 */}
+                  <p className="text-gray-700 text-sm leading-relaxed mb-4 relative z-10 min-h-[60px]">
+                    &ldquo;{testimonial.content}&rdquo;
+                  </p>
+
+                  {/* 학생 정보 */}
+                  <div className="pt-3 border-t border-gray-100">
+                    <p className="font-bold text-gray-900 text-base">
+                      {testimonial.name}
+                    </p>
+                    <p className="text-gray-500 text-xs mt-1">
+                      {testimonial.school}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          {/* 데스크톱: 그리드 */}
+          <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+            {testimonials.map((testimonial, idx) => (
+              <motion.div
+                key={testimonial.name}
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ 
+                  duration: CARD_ANIMATION_DURATION, 
+                  delay: idx * CARD_ANIMATION_DELAY,
+                  ease: "easeOut" 
+                }}
+                className="relative bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100"
+              >
+                {/* 따옴표 아이콘 */}
+                <div className="absolute top-4 right-4 text-sky-200">
+                  <Quote className="w-12 h-12" />
+                </div>
+
+                {/* 별점 */}
+                <div className="flex gap-1 mb-4">
+                  {[...Array(testimonial.rating)].map((_, i) => (
+                    <svg
+                      key={i}
+                      className="w-5 h-5 text-yellow-400 fill-current"
+                      viewBox="0 0 20 20"
+                    >
+                      <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                    </svg>
+                  ))}
+                </div>
+
+                {/* 후기 내용 */}
+                <p className="text-gray-700 text-base leading-relaxed mb-6 relative z-10">
+                  &ldquo;{testimonial.content}&rdquo;
+                </p>
+
+                {/* 학생 정보 */}
+                <div className="pt-4 border-t border-gray-100">
+                  <p className="font-bold text-gray-900 text-lg">
+                    {testimonial.name}
+                  </p>
+                  <p className="text-gray-500 text-sm mt-1">
+                    {testimonial.school}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        {/* 하단 문구 */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
+          className="text-center mt-16 sm:mt-20"
+        >
+          <p className="text-base sm:text-lg md:text-xl text-gray-600 font-medium">
+            당신도 VERADI와 함께 <span className="text-sky-600 font-bold">1%의 성공</span>을 경험하세요
+          </p>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
