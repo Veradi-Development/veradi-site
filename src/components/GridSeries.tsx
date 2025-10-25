@@ -201,7 +201,7 @@ export default function GridSeries() {
                   {/* 가운데 구매하기 버튼 */}
                   {subject.purchase_link && (
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                      <span className="opacity-0 group-hover/books:opacity-80 transition-all duration-300 bg-white/90 backdrop-blur-sm text-gray-800 px-4 sm:px-6 py-2 sm:py-3 rounded-full text-sm sm:text-base font-semibold shadow-xl transform group-hover/books:scale-110 pointer-events-auto border border-gray-200">
+                      <span className="opacity-0 group-hover/books:opacity-100 transition-all duration-300 bg-white/90 backdrop-blur-sm text-gray-800 px-4 sm:px-6 py-2 sm:py-3 rounded-full text-sm sm:text-base font-semibold shadow-xl transform group-hover/books:scale-110 pointer-events-auto border border-gray-200">
                         구매하기
                       </span>
                     </div>

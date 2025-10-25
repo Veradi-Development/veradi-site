@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'veradi2025';
+const ADMIN_PASSWORD = 'veradi2025';
 
 // GET: 가이드 섹션 정보 가져오기
 export async function GET() {

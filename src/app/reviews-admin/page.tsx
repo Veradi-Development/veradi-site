@@ -1,9 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 
-type Testimonial = {
+type Review = {
   id: string;
   name: string;
   school: string;
@@ -16,8 +15,12 @@ type Testimonial = {
 
 const ADMIN_PASSWORD = 'veradi2025';
 
-export default function AdminTestimonialsPage() {
-  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+export default function AdminReviewsPage() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -29,31 +32,44 @@ export default function AdminTestimonialsPage() {
     display_order: 0,
   });
 
-  const fetchTestimonials = async () => {
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password === ADMIN_PASSWORD) {
+      setIsAuthenticated(true);
+      setError('');
+    } else {
+      setError('비밀번호가 올바르지 않습니다');
+      setPassword('');
+    }
+  };
+
+  const fetchReviews = async () => {
     try {
-      const response = await fetch('/api/testimonials');
+      const response = await fetch('/api/reviews');
       if (response.ok) {
         const data = await response.json();
         if (Array.isArray(data)) {
-          setTestimonials(data);
+          setReviews(data);
         }
       }
     } catch (error) {
-      console.error('Error fetching testimonials:', error);
+      console.error('Error fetching reviews:', error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchTestimonials();
-  }, []);
+    if (isAuthenticated) {
+      fetchReviews();
+    }
+  }, [isAuthenticated]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      const url = editingId ? `/api/testimonials/${editingId}` : '/api/testimonials';
+      const url = editingId ? `/api/reviews/${editingId}` : '/api/reviews';
       const method = editingId ? 'PUT' : 'POST';
 
       const response = await fetch(url, {
@@ -73,7 +89,7 @@ export default function AdminTestimonialsPage() {
           rating: 5,
           display_order: 0,
         });
-        fetchTestimonials();
+        fetchReviews();
       } else {
         const error = await response.json();
         alert(`오류: ${error.error}`);
@@ -84,15 +100,15 @@ export default function AdminTestimonialsPage() {
     }
   };
 
-  const handleEdit = (testimonial: Testimonial) => {
+  const handleEdit = (review: Review) => {
     setFormData({
-      name: testimonial.name,
-      school: testimonial.school,
-      content: testimonial.content,
-      rating: testimonial.rating,
-      display_order: testimonial.display_order,
+      name: review.name,
+      school: review.school,
+      content: review.content,
+      rating: review.rating,
+      display_order: review.display_order,
     });
-    setEditingId(testimonial.id);
+    setEditingId(review.id);
     setShowForm(true);
   };
 
@@ -100,13 +116,13 @@ export default function AdminTestimonialsPage() {
     if (!confirm('정말 삭제하시겠습니까?')) return;
 
     try {
-      const response = await fetch(`/api/testimonials/${id}?password=${ADMIN_PASSWORD}`, {
+      const response = await fetch(`/api/reviews/${id}?password=${ADMIN_PASSWORD}`, {
         method: 'DELETE',
       });
 
       if (response.ok) {
         alert('후기가 삭제되었습니다');
-        fetchTestimonials();
+        fetchReviews();
       } else {
         const error = await response.json();
         alert(`오류: ${error.error}`);
@@ -116,6 +132,49 @@ export default function AdminTestimonialsPage() {
       alert('삭제 중 오류가 발생했습니다');
     }
   };
+
+  // 비밀번호 인증 화면
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center px-4">
+        <div className="max-w-md w-full">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">후기 관리</h1>
+            <p className="text-lg text-gray-600">관리자 인증이 필요합니다</p>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-200">
+            <form onSubmit={handleLogin} className="space-y-6">
+              <div>
+                <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+                  비밀번호
+                </label>
+                <input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  placeholder="비밀번호를 입력하세요"
+                  autoFocus
+                />
+                {error && (
+                  <p className="mt-2 text-sm text-red-600">{error}</p>
+                )}
+              </div>
+
+              <button
+                type="submit"
+                className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+              >
+                로그인
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -275,39 +334,39 @@ export default function AdminTestimonialsPage() {
                 </tr>
               </thead>
               <tbody>
-                {testimonials.length === 0 ? (
+                {reviews.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
                       등록된 후기가 없습니다.
                     </td>
                   </tr>
                 ) : (
-                  testimonials.map((testimonial) => (
-                    <tr key={testimonial.id} className="border-b border-gray-200 hover:bg-gray-50">
+                  reviews.map((review) => (
+                    <tr key={review.id} className="border-b border-gray-200 hover:bg-gray-50">
                       <td className="px-4 py-3 text-sm font-medium text-gray-900">
-                        {testimonial.name}
+                        {review.name}
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-600">
-                        {testimonial.school}
+                        {review.school}
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-700 max-w-md truncate">
-                        {testimonial.content}
+                        {review.content}
                       </td>
                       <td className="px-4 py-3 text-sm text-center">
-                        {'⭐'.repeat(testimonial.rating)}
+                        {'⭐'.repeat(review.rating)}
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-900 text-center">
-                        {testimonial.display_order}
+                        {review.display_order}
                       </td>
                       <td className="px-4 py-3 text-sm text-center">
                         <button
-                          onClick={() => handleEdit(testimonial)}
+                          onClick={() => handleEdit(review)}
                           className="text-blue-600 hover:text-blue-700 mr-3"
                         >
                           수정
                         </button>
                         <button
-                          onClick={() => handleDelete(testimonial.id)}
+                          onClick={() => handleDelete(review.id)}
                           className="text-red-600 hover:text-red-700"
                         >
                           삭제

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 
 type PublicationGuide = {
   id: string;
@@ -34,10 +33,15 @@ type PublicationBook = {
 const ADMIN_PASSWORD = 'veradi2025';
 
 export default function AdminPublicationsPage() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  
   const [activeTab, setActiveTab] = useState<'guide' | 'sections' | 'books'>('guide');
   const [loading, setLoading] = useState(true);
 
   // Guide state
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [guide, setGuide] = useState<PublicationGuide | null>(null);
   const [guideForm, setGuideForm] = useState({
     main_title: '',
@@ -54,7 +58,7 @@ export default function AdminPublicationsPage() {
     category: '',
     title: '',
     guide_url: '',
-    use_subjects_background: false,
+    use_subjects_background: true, // subjects 배경이 기본
     display_order: 0,
   });
 
@@ -64,7 +68,6 @@ export default function AdminPublicationsPage() {
   const [showBookForm, setShowBookForm] = useState(false);
   const [editingBookId, setEditingBookId] = useState<string | null>(null);
   const [bookForm, setBookForm] = useState({
-    title: '',
     subject: '',
     category: '',
     series: '',
@@ -72,13 +75,27 @@ export default function AdminPublicationsPage() {
     purchase_link: '',
     display_order: 0,
   });
+  const [uploadingImage, setUploadingImage] = useState(false);
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password === ADMIN_PASSWORD) {
+      setIsAuthenticated(true);
+      setError('');
+    } else {
+      setError('비밀번호가 올바르지 않습니다');
+      setPassword('');
+    }
+  };
 
   // Fetch data
   useEffect(() => {
-    fetchGuide();
-    fetchSections();
-    fetchBooks();
-  }, []);
+    if (isAuthenticated) {
+      fetchGuide();
+      fetchSections();
+      fetchBooks();
+    }
+  }, [isAuthenticated]);
 
   const fetchGuide = async () => {
     try {
@@ -116,6 +133,7 @@ export default function AdminPublicationsPage() {
 
   const fetchBooks = async () => {
     try {
+      // publications 교재 가져오기 (type='publication')
       const response = await fetch('/api/books?type=publication');
       if (response.ok) {
         const data = await response.json();
@@ -172,7 +190,7 @@ export default function AdminPublicationsPage() {
           category: '',
           title: '',
           guide_url: '',
-          use_subjects_background: false,
+          use_subjects_background: true,
           display_order: 0,
         });
         fetchSections();
@@ -214,11 +232,18 @@ export default function AdminPublicationsPage() {
       const url = editingBookId ? `/api/books/${editingBookId}` : '/api/books';
       const method = editingBookId ? 'PUT' : 'POST';
 
+      // 제목 자동 생성: "과목 + 시리즈" 또는 "과목"만
+      const generatedTitle = bookForm.series 
+        ? `${bookForm.subject} ${bookForm.series}` 
+        : bookForm.subject;
+
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...bookForm,
+          title: generatedTitle,
+          // publications 교재는 type='publication'으로 설정
           type: 'publication',
           password: ADMIN_PASSWORD,
         }),
@@ -229,7 +254,6 @@ export default function AdminPublicationsPage() {
         setShowBookForm(false);
         setEditingBookId(null);
         setBookForm({
-          title: '',
           subject: '',
           category: '',
           series: '',
@@ -245,6 +269,34 @@ export default function AdminPublicationsPage() {
     } catch (error) {
       console.error('Error submitting:', error);
       alert('제출 중 오류가 발생했습니다');
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    try {
+      const uploadFormData = new FormData();
+      uploadFormData.append('file', file);
+
+      const response = await fetch(`/api/upload?password=${encodeURIComponent(ADMIN_PASSWORD)}`, {
+        method: 'POST',
+        body: uploadFormData,
+      });
+
+      if (!response.ok) {
+        throw new Error('이미지 업로드 실패');
+      }
+
+      const data = await response.json();
+      setBookForm(prev => ({ ...prev, front_image_url: data.url }));
+      alert('이미지가 업로드되었습니다');
+    } catch (error) {
+      alert(error instanceof Error ? error.message : '이미지 업로드 중 오류가 발생했습니다');
+    } finally {
+      setUploadingImage(false);
     }
   };
 
@@ -269,9 +321,60 @@ export default function AdminPublicationsPage() {
     }
   };
 
-  const filteredBooks = selectedCategory === 'all' 
+  const filteredBooks = (selectedCategory === 'all' 
     ? books 
-    : books.filter(book => book.category === selectedCategory);
+    : books.filter(book => book.category === selectedCategory))
+    .sort((a, b) => {
+      // 카테고리별로 먼저 정렬
+      if (a.category !== b.category) {
+        return (a.category || '').localeCompare(b.category || '');
+      }
+      // 같은 카테고리 내에서는 display_order로 정렬
+      return (a.display_order || 0) - (b.display_order || 0);
+    });
+
+  // 비밀번호 인증 화면
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center px-4">
+        <div className="max-w-md w-full">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">출판물 관리</h1>
+            <p className="text-lg text-gray-600">관리자 인증이 필요합니다</p>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-200">
+            <form onSubmit={handleLogin} className="space-y-6">
+              <div>
+                <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+                  비밀번호
+                </label>
+                <input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  placeholder="비밀번호를 입력하세요"
+                  autoFocus
+                />
+                {error && (
+                  <p className="mt-2 text-sm text-red-600">{error}</p>
+                )}
+              </div>
+
+              <button
+                type="submit"
+                className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+              >
+                로그인
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -411,7 +514,7 @@ export default function AdminPublicationsPage() {
                   category: '',
                   title: '',
                   guide_url: '',
-                  use_subjects_background: false,
+                  use_subjects_background: true,
                   display_order: 0,
                 });
               }}
@@ -485,11 +588,11 @@ export default function AdminPublicationsPage() {
                   <label className="flex items-center gap-2">
                     <input
                       type="checkbox"
-                      checked={sectionForm.use_subjects_background}
-                      onChange={(e) => setSectionForm({ ...sectionForm, use_subjects_background: e.target.checked })}
+                      checked={!sectionForm.use_subjects_background}
+                      onChange={(e) => setSectionForm({ ...sectionForm, use_subjects_background: !e.target.checked })}
                       className="w-4 h-4"
                     />
-                    <span className="text-sm text-gray-700">Subjects 스타일 배경 사용</span>
+                    <span className="text-sm text-gray-700">그리드 스타일 배경 사용</span>
                   </label>
                 </div>
 
@@ -580,27 +683,30 @@ export default function AdminPublicationsPage() {
         {/* 교재 관리 탭 */}
         {activeTab === 'books' && (
           <div>
-            {/* 카테고리 필터 */}
+            {/* 상단 버튼 및 필터 */}
             <div className="mb-6 flex gap-3 items-center">
-              <label className="text-sm font-medium text-gray-700">카테고리 필터:</label>
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="all">전체</option>
-                {sections.map((section) => (
-                  <option key={section.category} value={section.category}>
-                    {section.title}
-                  </option>
-                ))}
-              </select>
+              {!showBookForm && (
+                <>
+                  <label className="text-sm font-medium text-gray-700">보기 필터:</label>
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="all">전체 교재 보기</option>
+                    {sections.map((section) => (
+                      <option key={section.category} value={section.category}>
+                        {section.title}만 보기
+                      </option>
+                    ))}
+                  </select>
+                </>
+              )}
               <button
                 onClick={() => {
                   setShowBookForm(!showBookForm);
                   setEditingBookId(null);
                   setBookForm({
-                    title: '',
                     subject: '',
                     category: selectedCategory !== 'all' ? selectedCategory : '',
                     series: '',
@@ -624,20 +730,6 @@ export default function AdminPublicationsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      제목 *
-                    </label>
-                    <input
-                      type="text"
-                      value={bookForm.title}
-                      onChange={(e) => setBookForm({ ...bookForm, title: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                      placeholder="물리학 GRID 개념편"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
                       과목 *
                     </label>
                     <input
@@ -648,25 +740,6 @@ export default function AdminPublicationsPage() {
                       placeholder="물리학"
                       required
                     />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      카테고리 *
-                    </label>
-                    <select
-                      value={bookForm.category}
-                      onChange={(e) => setBookForm({ ...bookForm, category: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                      required
-                    >
-                      <option value="">선택하세요</option>
-                      {sections.map((section) => (
-                        <option key={section.category} value={section.category}>
-                          {section.title}
-                        </option>
-                      ))}
-                    </select>
                   </div>
 
                   <div>
@@ -684,15 +757,50 @@ export default function AdminPublicationsPage() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      이미지 URL
+                      카테고리 * (섹션 선택)
                     </label>
-                    <input
-                      type="url"
-                      value={bookForm.front_image_url}
-                      onChange={(e) => setBookForm({ ...bookForm, front_image_url: e.target.value })}
+                    <select
+                      value={bookForm.category}
+                      onChange={(e) => setBookForm({ ...bookForm, category: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                      placeholder="/images/grid_kinetic_front.jpg"
-                    />
+                      required
+                    >
+                      <option value="">선택하세요</option>
+                      {sections.map((section) => (
+                        <option key={section.category} value={section.category}>
+                          {section.title}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      교재 이미지
+                    </label>
+                    <div className="space-y-2">
+                      <div className="flex gap-2">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageUpload}
+                          disabled={uploadingImage}
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+                        />
+                        {uploadingImage && <span className="text-sm text-blue-600">업로드 중...</span>}
+                      </div>
+                      <input
+                        type="url"
+                        value={bookForm.front_image_url}
+                        onChange={(e) => setBookForm({ ...bookForm, front_image_url: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+                        placeholder="또는 URL 직접 입력: /images/grid_kinetic_front.jpg"
+                      />
+                      {bookForm.front_image_url && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={bookForm.front_image_url} alt="미리보기" className="w-32 h-40 object-cover rounded border" />
+                      )}
+                    </div>
                   </div>
 
                   <div>
@@ -710,14 +818,17 @@ export default function AdminPublicationsPage() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      표시 순서
+                      표시 순서 (카테고리 내)
                     </label>
                     <input
                       type="number"
                       value={bookForm.display_order}
                       onChange={(e) => setBookForm({ ...bookForm, display_order: parseInt(e.target.value) })}
+                      min="0"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      placeholder="같은 카테고리 내에서의 순서"
                     />
+                    <p className="text-xs text-gray-500 mt-1">* 선택한 카테고리 섹션 내에서 표시되는 순서입니다</p>
                   </div>
                 </div>
 
@@ -776,7 +887,6 @@ export default function AdminPublicationsPage() {
                           <button
                             onClick={() => {
                               setBookForm({
-                                title: book.title,
                                 subject: book.subject,
                                 category: book.category || '',
                                 series: book.series || '',

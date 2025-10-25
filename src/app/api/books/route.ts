@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'veradi2025';
+const ADMIN_PASSWORD = 'veradi2025';
 
 // GET: 모든 교재 가져오기
 export async function GET(request: NextRequest) {
@@ -40,6 +40,8 @@ export async function POST(request: NextRequest) {
       subject, 
       description, 
       type, 
+      category,
+      series,
       main_image_url, 
       sub_image_url, 
       front_image_url, 
@@ -60,6 +62,14 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+    
+    // publications 교재는 category도 필수
+    if (type === 'publication' && !category) {
+      return NextResponse.json(
+        { error: 'Category is required for publication books' },
+        { status: 400 }
+      );
+    }
 
     const { data, error } = await supabase
       .from('books')
@@ -68,6 +78,8 @@ export async function POST(request: NextRequest) {
         subject,
         description,
         type,
+        category,
+        series,
         main_image_url,
         sub_image_url,
         front_image_url,

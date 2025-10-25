@@ -9,6 +9,10 @@ const RichTextEditor = dynamic(() => import('@/components/RichTextEditor'), { ss
 const ADMIN_PASSWORD = 'veradi2025';
 
 export default function AdminAnnouncementsPage() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -21,10 +25,22 @@ export default function AdminAnnouncementsPage() {
   const [uploading, setUploading] = useState(false);
   const [attachments, setAttachments] = useState<Array<{ name: string; url: string; size: number; type: string }>>([]); // 별도 파일 목록 상태
 
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password === ADMIN_PASSWORD) {
+      setIsAuthenticated(true);
+      setError('');
+    } else {
+      setError('비밀번호가 올바르지 않습니다');
+      setPassword('');
+    }
+  };
 
   useEffect(() => {
-    fetchAnnouncements();
-  }, []);
+    if (isAuthenticated) {
+      fetchAnnouncements();
+    }
+  }, [isAuthenticated]);
 
   const fetchAnnouncements = async () => {
     try {
@@ -201,6 +217,49 @@ export default function AdminAnnouncementsPage() {
       minute: '2-digit',
     });
   };
+
+  // 비밀번호 인증 화면
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center px-4">
+        <div className="max-w-md w-full">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">공지사항 관리</h1>
+            <p className="text-lg text-gray-600">관리자 인증이 필요합니다</p>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-200">
+            <form onSubmit={handleLogin} className="space-y-6">
+              <div>
+                <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+                  비밀번호
+                </label>
+                <input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  placeholder="비밀번호를 입력하세요"
+                  autoFocus
+                />
+                {error && (
+                  <p className="mt-2 text-sm text-red-600">{error}</p>
+                )}
+              </div>
+
+              <button
+                type="submit"
+                className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+              >
+                로그인
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">

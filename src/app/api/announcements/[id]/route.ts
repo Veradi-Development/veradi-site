@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
+const ADMIN_PASSWORD = 'veradi2025';
+
 // 특정 공지사항 조회
 export async function GET(
   request: NextRequest,
@@ -19,7 +21,7 @@ export async function GET(
     }
 
     return NextResponse.json(data);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch announcement' },
       { status: 500 }
@@ -37,7 +39,7 @@ export async function PUT(
     const { title, content, attachments, password } = await request.json();
 
     // 간단한 비밀번호 인증
-    if (password !== process.env.ADMIN_PASSWORD) {
+    if (password !== ADMIN_PASSWORD) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -67,7 +69,7 @@ export async function PUT(
     }
 
     return NextResponse.json(data);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to update announcement' },
       { status: 500 }
@@ -85,7 +87,7 @@ export async function DELETE(
     const { password } = await request.json();
 
     // 간단한 비밀번호 인증
-    if (password !== process.env.ADMIN_PASSWORD) {
+    if (password !== ADMIN_PASSWORD) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -102,7 +104,7 @@ export async function DELETE(
     }
 
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to delete announcement' },
       { status: 500 }

@@ -14,23 +14,23 @@ export default function NoticeDetailPage({ params }: { params: Promise<{ id: str
   const [error, setError] = useState('');
 
   useEffect(() => {
+    const fetchAnnouncement = async () => {
+      try {
+        const response = await fetch(`/api/announcements/${id}`);
+        if (!response.ok) {
+          throw new Error('공지사항을 찾을 수 없습니다.');
+        }
+        const data = await response.json();
+        setAnnouncement(data);
+      } catch (error) {
+        setError(error instanceof Error ? error.message : '오류가 발생했습니다.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchAnnouncement();
   }, [id]);
-
-  const fetchAnnouncement = async () => {
-    try {
-      const response = await fetch(`/api/announcements/${id}`);
-      if (!response.ok) {
-        throw new Error('공지사항을 찾을 수 없습니다.');
-      }
-      const data = await response.json();
-      setAnnouncement(data);
-    } catch (error) {
-      setError(error instanceof Error ? error.message : '오류가 발생했습니다.');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);

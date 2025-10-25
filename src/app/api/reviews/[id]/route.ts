@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'veradi2025';
+const ADMIN_PASSWORD = 'veradi2025';
 
 // GET: 특정 후기 가져오기
 export async function GET(
@@ -93,7 +93,7 @@ export async function DELETE(
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ message: 'Testimonial deleted successfully' });
+    return NextResponse.json({ message: 'Review deleted successfully' });
   } catch (error) {
     console.error('Server error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

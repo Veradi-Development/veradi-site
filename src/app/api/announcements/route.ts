@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
+const ADMIN_PASSWORD = 'veradi2025';
+
 // 공지사항 목록 조회
 export async function GET() {
   try {
@@ -14,7 +16,7 @@ export async function GET() {
     }
 
     return NextResponse.json(data);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch announcements' },
       { status: 500 }
@@ -28,7 +30,7 @@ export async function POST(request: NextRequest) {
     const { title, content, attachments, password } = await request.json();
 
     // 간단한 비밀번호 인증
-    if (password !== process.env.ADMIN_PASSWORD) {
+    if (password !== ADMIN_PASSWORD) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -57,7 +59,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(data, { status: 201 });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to create announcement' },
       { status: 500 }

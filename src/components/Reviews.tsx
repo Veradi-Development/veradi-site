@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Quote } from "lucide-react";
 import { useState, useEffect } from "react";
 
-type Testimonial = {
+type Review = {
   id: string;
   name: string;
   school: string;
@@ -17,29 +17,29 @@ const TITLE_ANIMATION_DURATION = 0.6;
 const CARD_ANIMATION_DURATION = 0.5;
 const CARD_ANIMATION_DELAY = 0.1;
 
-export default function Testimonials() {
-  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+export default function Reviews() {
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // API에서 후기 가져오기
-    const fetchTestimonials = async () => {
+    const fetchReviews = async () => {
       try {
-        const response = await fetch('/api/testimonials');
+        const response = await fetch('/api/reviews');
         if (response.ok) {
           const data = await response.json();
           if (Array.isArray(data)) {
-            setTestimonials(data);
+            setReviews(data);
           }
         }
       } catch (error) {
-        console.error('Error fetching testimonials:', error);
+        console.error('Error fetching reviews:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchTestimonials();
+    fetchReviews();
   }, []);
   return (
     <section className="relative bg-gradient-to-b from-blue-50 via-white to-blue-50/50 py-20 sm:py-28 md:py-36 px-4 sm:px-6 overflow-hidden">
@@ -79,7 +79,7 @@ export default function Testimonials() {
           <div className="flex justify-center items-center py-20">
             <p className="text-gray-500">로딩 중...</p>
           </div>
-        ) : testimonials.length === 0 ? (
+        ) : reviews.length === 0 ? (
           <div className="flex justify-center items-center py-20">
             <p className="text-gray-500">등록된 후기가 없습니다</p>
           </div>
@@ -88,9 +88,9 @@ export default function Testimonials() {
             {/* 모바일: 가로 스크롤 */}
             <div className="md:hidden overflow-x-auto scrollbar-hide -mx-4 px-4">
               <div className="flex gap-4 pb-4">
-                {testimonials.map((testimonial, idx) => (
+                {reviews.map((review, idx) => (
                 <motion.div
-                  key={testimonial.name}
+                  key={review.name}
                   initial={{ opacity: 0, x: 50 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true, margin: "-50px" }}
@@ -108,7 +108,7 @@ export default function Testimonials() {
 
                   {/* 별점 */}
                   <div className="flex gap-1 mb-3">
-                    {[...Array(testimonial.rating)].map((_, i) => (
+                    {[...Array(review.rating)].map((_, i) => (
                       <svg
                         key={i}
                         className="w-5 h-5 text-yellow-400 fill-current"
@@ -121,16 +121,16 @@ export default function Testimonials() {
 
                   {/* 후기 내용 */}
                   <p className="text-gray-700 text-sm leading-relaxed mb-4 relative z-10 min-h-[60px]">
-                    &ldquo;{testimonial.content}&rdquo;
+                    &ldquo;{review.content}&rdquo;
                   </p>
 
                   {/* 학생 정보 */}
                   <div className="pt-3 border-t border-gray-100">
                     <p className="font-bold text-gray-900 text-base">
-                      {testimonial.name}
+                      {review.name}
                     </p>
                     <p className="text-gray-500 text-xs mt-1">
-                      {testimonial.school}
+                      {review.school}
                     </p>
                   </div>
                 </motion.div>
@@ -140,9 +140,9 @@ export default function Testimonials() {
 
           {/* 데스크톱: 그리드 */}
           <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-            {testimonials.map((testimonial, idx) => (
+            {reviews.map((review, idx) => (
               <motion.div
-                key={testimonial.name}
+                key={review.name}
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
@@ -160,7 +160,7 @@ export default function Testimonials() {
 
                 {/* 별점 */}
                 <div className="flex gap-1 mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
+                  {[...Array(review.rating)].map((_, i) => (
                     <svg
                       key={i}
                       className="w-5 h-5 text-yellow-400 fill-current"
@@ -173,16 +173,16 @@ export default function Testimonials() {
 
                 {/* 후기 내용 */}
                 <p className="text-gray-700 text-base leading-relaxed mb-6 relative z-10">
-                  &ldquo;{testimonial.content}&rdquo;
+                  &ldquo;{review.content}&rdquo;
                 </p>
 
                 {/* 학생 정보 */}
                 <div className="pt-4 border-t border-gray-100">
                   <p className="font-bold text-gray-900 text-lg">
-                    {testimonial.name}
+                    {review.name}
                   </p>
                   <p className="text-gray-500 text-sm mt-1">
-                    {testimonial.school}
+                    {review.school}
                   </p>
                 </div>
                 </motion.div>

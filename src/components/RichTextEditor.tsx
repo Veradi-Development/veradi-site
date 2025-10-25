@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import 'react-quill-new/dist/quill.snow.css';
 
@@ -14,10 +14,11 @@ interface RichTextEditorProps {
 }
 
 export default function RichTextEditor({ value, onChange, onImageUpload }: RichTextEditorProps) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const quillRef = useRef<any>(null);
 
   // 이미지 핸들러
-  const imageHandler = () => {
+  const imageHandler = useCallback(() => {
     const input = document.createElement('input');
     input.setAttribute('type', 'file');
     input.setAttribute('accept', 'image/*');
@@ -37,11 +38,11 @@ export default function RichTextEditor({ value, onChange, onImageUpload }: RichT
           const range = quill.getSelection();
           quill.insertEmbed(range.index, 'image', imageUrl);
         }
-      } catch (error) {
+      } catch {
         alert('이미지 업로드에 실패했습니다.');
       }
     };
-  };
+  }, [onImageUpload]);
 
   const modules = useMemo(
     () => ({
@@ -60,7 +61,7 @@ export default function RichTextEditor({ value, onChange, onImageUpload }: RichT
         },
       },
     }),
-    []
+    [imageHandler]
   );
 
   const formats = [
@@ -80,7 +81,6 @@ export default function RichTextEditor({ value, onChange, onImageUpload }: RichT
   return (
     <div className="rich-text-editor">
       <ReactQuill
-        ref={quillRef}
         theme="snow"
         value={value}
         onChange={onChange}
@@ -88,6 +88,8 @@ export default function RichTextEditor({ value, onChange, onImageUpload }: RichT
         formats={formats}
         placeholder="공지사항 내용을 입력하세요. 이미지는 툴바의 이미지 버튼을 클릭하여 삽입할 수 있습니다."
         style={{ height: '400px', marginBottom: '60px' }}
+        // @ts-expect-error - ReactQuill ref type issue
+        ref={quillRef}
       />
       <style jsx global>{`
         .rich-text-editor .ql-editor {

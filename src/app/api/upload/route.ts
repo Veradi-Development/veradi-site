@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
+const ADMIN_PASSWORD = 'veradi2025';
+
 export async function POST(request: NextRequest) {
   try {
     // 쿼리 파라미터에서 비밀번호 가져오기
     const password = request.nextUrl.searchParams.get('password');
 
     // 간단한 비밀번호 인증
-    if (password !== process.env.ADMIN_PASSWORD) {
+    if (password !== ADMIN_PASSWORD) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -34,7 +36,7 @@ export async function POST(request: NextRequest) {
     const fileName = `${timestamp}_${safeName}${extension}`;
 
     // Supabase Storage에 업로드
-    const { data, error } = await supabase.storage
+    const { error } = await supabase.storage
       .from('announcement-files')
       .upload(fileName, file, {
         cacheControl: '3600',
@@ -75,7 +77,7 @@ export async function DELETE(request: NextRequest) {
     const { password, fileName } = await request.json();
 
     // 간단한 비밀번호 인증
-    if (password !== process.env.ADMIN_PASSWORD) {
+    if (password !== ADMIN_PASSWORD) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -102,7 +104,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to delete file' },
       { status: 500 }

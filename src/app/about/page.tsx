@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import ValueProposition from "@/components/ValueProposition";
-import Testimonials from "@/components/Testimonials";
+import Reviews from "@/components/Reviews";
 import VeradiMakers from "@/components/VeradiMakers";
 import Footer from "@/components/Footer";
 
@@ -16,7 +16,7 @@ export default function About() {
     <main className="bg-white text-gray-900">
       <Navbar />
       <ValueProposition />
-      <Testimonials />
+      <Reviews />
       <VeradiMakers />
       <Footer />
     </main>

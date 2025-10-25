@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'veradi2025';
+const ADMIN_PASSWORD = 'veradi2025';
 
 // GET: 특정 교재 가져오기
 export async function GET(
@@ -41,6 +41,8 @@ export async function PUT(
       subject, 
       description, 
       type, 
+      category,
+      series,
       main_image_url, 
       sub_image_url, 
       front_image_url, 
@@ -61,6 +63,8 @@ export async function PUT(
         subject,
         description,
         type,
+        category,
+        series,
         main_image_url,
         sub_image_url,
         front_image_url,

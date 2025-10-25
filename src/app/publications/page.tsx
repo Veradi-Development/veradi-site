@@ -24,6 +24,7 @@ type BookData = {
   series: string;
   front: string | null;
   link: string;
+  display_order: number;
 };
 
 type PublicationGuide = {
@@ -284,27 +285,45 @@ export default function Publications() {
           }
         }
 
-        // 교재 로드
+        // 교재 로드 (type='publication')
         const booksRes = await fetch('/api/books?type=publication');
         if (booksRes.ok) {
           const booksData = await booksRes.json();
           if (Array.isArray(booksData)) {
             // 카테고리별로 그룹화
             const grouped: Record<string, BookData[]> = {};
-            booksData.forEach((book: any) => {
-              const category = book.category || 'uncategorized';
-              if (!grouped[category]) {
-                grouped[category] = [];
+            booksData.forEach((book: {
+              id: string;
+              title: string;
+              subject: string;
+              series?: string;
+              front_image_url: string | null;
+              purchase_link?: string;
+              display_order?: number;
+              category?: string;
+            }) => {
+              if (book.category) {
+                const category = book.category;
+                if (!grouped[category]) {
+                  grouped[category] = [];
+                }
+                grouped[category].push({
+                  id: book.id,
+                  title: book.title,
+                  subject: book.subject,
+                  series: book.series || '',
+                  front: book.front_image_url,
+                  link: book.purchase_link || '#',
+                  display_order: book.display_order || 0,
+                });
               }
-              grouped[category].push({
-                id: book.id,
-                title: book.title,
-                subject: book.subject,
-                series: book.series || '',
-                front: book.front_image_url,
-                link: book.purchase_link || '#',
-              });
             });
+            
+            // 각 카테고리 내에서 display_order로 정렬
+            Object.keys(grouped).forEach(category => {
+              grouped[category].sort((a, b) => a.display_order - b.display_order);
+            });
+            
             setBooksByCategory(grouped);
           }
         }
