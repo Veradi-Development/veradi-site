@@ -22,7 +22,14 @@ function getSupabaseClient() {
   return supabaseInstance;
 }
 
-export const supabase = getSupabaseClient();
+// Proxy object to delay initialization until first use
+export const supabase = new Proxy({} as SupabaseClient, {
+  get(target, prop) {
+    const client = getSupabaseClient();
+    const value = (client as any)[prop];
+    return typeof value === 'function' ? value.bind(client) : value;
+  }
+});
 
 export type AttachmentFile = {
   name: string;
