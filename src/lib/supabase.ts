@@ -1,36 +1,15 @@
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
 
-let supabaseInstance: SupabaseClient | null = null;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-function getSupabaseClient() {
-  if (supabaseInstance) {
-    return supabaseInstance;
-  }
-
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!supabaseUrl) {
-    throw new Error('Missing environment variable: NEXT_PUBLIC_SUPABASE_URL');
-  }
-
-  if (!supabaseAnonKey) {
-    throw new Error('Missing environment variable: NEXT_PUBLIC_SUPABASE_ANON_KEY');
-  }
-
-  supabaseInstance = createClient(supabaseUrl, supabaseAnonKey);
-  return supabaseInstance;
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error('Missing Supabase environment variables');
+  console.error('NEXT_PUBLIC_SUPABASE_URL:', supabaseUrl ? 'Set' : 'Missing');
+  console.error('NEXT_PUBLIC_SUPABASE_ANON_KEY:', supabaseAnonKey ? 'Set' : 'Missing');
 }
 
-// Proxy object to delay initialization until first use
-export const supabase = new Proxy({} as SupabaseClient, {
-  get(target, prop) {
-    const client = getSupabaseClient();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const value = (client as any)[prop];
-    return typeof value === 'function' ? value.bind(client) : value;
-  }
-});
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export type AttachmentFile = {
   name: string;
