@@ -1,0 +1,13 @@
+{
+  "functions": {
+    "api/**": {
+      "maxDuration": 30
+    }
+  },
+  "api": {
+    "bodyParser": {
+      "sizeLimit": "10mb"
+    }
+  }
+}
+

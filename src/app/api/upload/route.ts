@@ -35,10 +35,15 @@ export async function POST(request: NextRequest) {
       .replace(/[^a-zA-Z0-9]/g, '_'); // 영문, 숫자만 허용
     const fileName = `${timestamp}_${safeName}${extension}`;
 
+    // File을 ArrayBuffer로 변환
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
     // Supabase Storage에 업로드
     const { error } = await supabase.storage
       .from('announcement-files')
-      .upload(fileName, file, {
+      .upload(fileName, buffer, {
+        contentType: file.type,
         cacheControl: '3600',
         upsert: false,
       });
