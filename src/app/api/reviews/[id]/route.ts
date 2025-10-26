@@ -3,6 +3,9 @@ import { supabase } from '@/lib/supabase';
 
 const ADMIN_PASSWORD = 'veradi2025';
 
+// 캐시 설정: 5분 (300초)
+export const revalidate = 300;
+
 // GET: 특정 후기 가져오기
 export async function GET(
   request: NextRequest,

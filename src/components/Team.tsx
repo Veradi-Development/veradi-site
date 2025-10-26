@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { GraduationCap, Stethoscope, Users } from "lucide-react";
+import { useMobileDetect } from "@/hooks/useMobileDetect";
 
 const highlights = [
   {
@@ -22,14 +23,16 @@ const highlights = [
 ];
 
 export default function Team() {
+  const isMobile = useMobileDetect();
+  
   return (
     <section className="bg-white px-6 py-28">
       <div className="max-w-6xl mx-auto">
         {/* 헤드라인 */}
         <motion.h2
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
+          initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 30 }}
+          whileInView={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
+          transition={{ duration: isMobile ? 0 : 0.5 }}
           viewport={{ once: true }}
           className="text-4xl md:text-5xl font-extrabold mb-6 leading-snug text-left"
         >
@@ -38,9 +41,9 @@ export default function Team() {
         </motion.h2>
 
         <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.8 }}
+          initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 20 }}
+          whileInView={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
+          transition={{ delay: isMobile ? 0 : 0.1, duration: isMobile ? 0 : 0.5 }}
           viewport={{ once: true }}
           className="text-gray-600 text-lg mb-20 max-w-3xl leading-relaxed text-left"
         >
@@ -57,9 +60,9 @@ export default function Team() {
             return (
               <motion.div
                 key={idx}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.2, duration: 0.8 }}
+                initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 40 }}
+                whileInView={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
+                transition={{ delay: isMobile ? 0 : Math.min(idx * 0.1, 0.2), duration: isMobile ? 0 : 0.5 }}
                 viewport={{ once: true }}
                 className="bg-gray-50 rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow text-left"
               >

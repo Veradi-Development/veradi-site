@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Quote } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useMobileDetect } from "@/hooks/useMobileDetect";
 
 type Review = {
   id: string;
@@ -12,17 +13,12 @@ type Review = {
   rating: number;
 };
 
-// 애니메이션 상수
-const TITLE_ANIMATION_DURATION = 0.6;
-const CARD_ANIMATION_DURATION = 0.5;
-const CARD_ANIMATION_DELAY = 0.1;
-
 export default function Reviews() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
+  const isMobile = useMobileDetect();
 
   useEffect(() => {
-    // API에서 후기 가져오기
     const fetchReviews = async () => {
       try {
         const response = await fetch('/api/reviews');
@@ -58,10 +54,10 @@ export default function Reviews() {
       <div className="max-w-7xl mx-auto relative z-10">
         {/* 섹션 제목 */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 30 }}
+          whileInView={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: TITLE_ANIMATION_DURATION, ease: "easeOut" }}
+          transition={{ duration: isMobile ? 0 : 0.5, ease: "easeOut" }}
           className="text-center mb-16 sm:mb-20"
         >
           <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-4">
@@ -91,12 +87,12 @@ export default function Reviews() {
                 {reviews.map((review, idx) => (
                 <motion.div
                   key={review.name}
-                  initial={{ opacity: 0, x: 50 }}
-                  whileInView={{ opacity: 1, x: 0 }}
+                  initial={isMobile ? { opacity: 1 } : { opacity: 0, x: 50 }}
+                  whileInView={isMobile ? { opacity: 1 } : { opacity: 1, x: 0 }}
                   viewport={{ once: true, margin: "-50px" }}
                   transition={{ 
-                    duration: CARD_ANIMATION_DURATION, 
-                    delay: idx * 0.05,
+                    duration: isMobile ? 0 : 0.4, 
+                    delay: isMobile ? 0 : Math.min(idx * 0.05, 0.2),
                     ease: "easeOut" 
                   }}
                   className="relative bg-white rounded-2xl p-6 shadow-lg border border-gray-100 flex-shrink-0 w-[85vw] max-w-[340px]"
@@ -143,15 +139,15 @@ export default function Reviews() {
             {reviews.map((review, idx) => (
               <motion.div
                 key={review.name}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 50 }}
+                whileInView={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ 
-                  duration: CARD_ANIMATION_DURATION, 
-                  delay: idx * CARD_ANIMATION_DELAY,
+                  duration: isMobile ? 0 : 0.4, 
+                  delay: isMobile ? 0 : Math.min(idx * 0.08, 0.24),
                   ease: "easeOut" 
                 }}
-                className="relative bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100"
+                className="relative bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-shadow duration-200 border border-gray-100"
               >
                 {/* 따옴표 아이콘 */}
                 <div className="absolute top-4 right-4 text-sky-200">
@@ -193,10 +189,10 @@ export default function Reviews() {
 
         {/* 하단 문구 */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 20 }}
+          whileInView={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
+          transition={{ duration: isMobile ? 0 : 0.4, ease: "easeOut" }}
           className="text-center mt-16 sm:mt-20"
         >
           <p className="text-base sm:text-lg md:text-xl text-gray-600 font-medium">

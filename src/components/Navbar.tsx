@@ -4,9 +4,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Instagram, Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useState, memo } from "react";
 
-export default function Navbar() {
+const Navbar = memo(function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
 
@@ -110,5 +110,7 @@ export default function Navbar() {
       )}
     </nav>
   );
-}
+});
+
+export default Navbar;
 

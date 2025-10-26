@@ -1,12 +1,14 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { useMobileDetect } from "@/hooks/useMobileDetect";
 
 export default function ValueProposition() {
   const [stage, setStage] = useState(0);
   const [marginValue, setMarginValue] = useState("-25px");
   const [spacingCount, setSpacingCount] = useState(1);
+  const isMobile = useMobileDetect();
 
   useEffect(() => {
     // 단계별 타이밍
@@ -47,6 +49,39 @@ export default function ValueProposition() {
     return () => window.removeEventListener("resize", updateMargin);
   }, []);
 
+  // 애니메이션 설정 메모이제이션
+  const glowAnimation = useMemo(() => ({
+    filter: isMobile ? [] : [
+      'drop-shadow(0 0 8px rgba(14, 165, 233, 0.3))',
+      'drop-shadow(0 0 12px rgba(14, 165, 233, 0.4))',
+      'drop-shadow(0 0 8px rgba(14, 165, 233, 0.3))',
+    ]
+  }), [isMobile]);
+
+  const glowAnimationCyan = useMemo(() => ({
+    filter: isMobile ? [] : [
+      'drop-shadow(0 0 8px rgba(6, 182, 212, 0.3))',
+      'drop-shadow(0 0 12px rgba(6, 182, 212, 0.4))',
+      'drop-shadow(0 0 8px rgba(6, 182, 212, 0.3))',
+    ]
+  }), [isMobile]);
+
+  const textGlowAnimation = useMemo(() => ({
+    textShadow: isMobile ? [] : [
+      '0 0 8px rgba(14, 165, 233, 0.2)',
+      '0 0 12px rgba(14, 165, 233, 0.3)',
+      '0 0 8px rgba(14, 165, 233, 0.2)',
+    ]
+  }), [isMobile]);
+
+  const textGlowAnimationCyan = useMemo(() => ({
+    textShadow: isMobile ? [] : [
+      '0 0 8px rgba(6, 182, 212, 0.2)',
+      '0 0 12px rgba(6, 182, 212, 0.3)',
+      '0 0 8px rgba(6, 182, 212, 0.2)',
+    ]
+  }), [isMobile]);
+
   return (
     <section
       id="value-proposition"
@@ -62,7 +97,7 @@ export default function ValueProposition() {
         <div className="relative h-[350px] sm:h-[400px] md:h-[450px] lg:h-[500px] flex items-center justify-center">
           <div className="absolute inset-0 flex items-center justify-center">
             {/* 합쳐진 후 배경 빛 효과 */}
-            {stage >= 3 && (
+            {stage >= 3 && !isMobile && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.5 }}
                 animate={{ opacity: 1, scale: 1.5 }}
@@ -72,7 +107,7 @@ export default function ValueProposition() {
                 <div 
                   className="w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 rounded-full blur-3xl"
                   style={{
-                    background: 'radial-gradient(circle, rgba(56, 189, 248, 0.2) 0%, rgba(6, 182, 212, 0.1) 50%, transparent 100%)'
+                    background: 'radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, rgba(6, 182, 212, 0.08) 50%, transparent 100%)'
                   }}
                 />
               </motion.div>
@@ -108,16 +143,10 @@ export default function ValueProposition() {
                       ? "bg-gradient-to-r from-sky-600 to-blue-600 bg-clip-text text-transparent"
                       : "text-sky-700"
                   }`}
-                  animate={stage >= 3 ? {
-                    filter: [
-                      'drop-shadow(0 0 15px rgba(14, 165, 233, 0.4))',
-                      'drop-shadow(0 0 25px rgba(14, 165, 233, 0.6))',
-                      'drop-shadow(0 0 15px rgba(14, 165, 233, 0.4))',
-                    ]
-                  } : {}}
+                  animate={stage >= 3 ? glowAnimation : {}}
                   transition={{
                     duration: 2,
-                    repeat: Infinity,
+                    repeat: isMobile ? 0 : Infinity,
                     ease: "easeInOut"
                   }}
                 >
@@ -163,16 +192,10 @@ export default function ValueProposition() {
                       ? "bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent"
                       : "text-cyan-600"
                   }`}
-                  animate={stage >= 3 ? {
-                    filter: [
-                      'drop-shadow(0 0 15px rgba(6, 182, 212, 0.4))',
-                      'drop-shadow(0 0 25px rgba(6, 182, 212, 0.6))',
-                      'drop-shadow(0 0 15px rgba(6, 182, 212, 0.4))',
-                    ]
-                  } : {}}
+                  animate={stage >= 3 ? glowAnimationCyan : {}}
                   transition={{
                     duration: 2,
-                    repeat: Infinity,
+                    repeat: isMobile ? 0 : Infinity,
                     ease: "easeInOut"
                   }}
                 >
@@ -203,16 +226,10 @@ export default function ValueProposition() {
               <div className="inline-flex items-center gap-2 sm:gap-3 relative">
                 <motion.span 
                   className="text-sky-600 font-bold text-xs sm:text-sm md:text-base lg:text-lg tracking-wider"
-                  animate={{
-                    textShadow: [
-                      '0 0 10px rgba(14, 165, 233, 0.3)',
-                      '0 0 20px rgba(14, 165, 233, 0.5)',
-                      '0 0 10px rgba(14, 165, 233, 0.3)',
-                    ]
-                  }}
+                  animate={textGlowAnimation}
                   transition={{
                     duration: 2,
-                    repeat: Infinity,
+                    repeat: isMobile ? 0 : Infinity,
                     ease: "easeInOut"
                   }}
                 >
@@ -221,16 +238,10 @@ export default function ValueProposition() {
                 <span className="text-gray-300 font-light text-sm sm:text-base md:text-lg lg:text-xl">×</span>
                 <motion.span 
                   className="text-cyan-600 font-bold text-xs sm:text-sm md:text-base lg:text-lg tracking-wider"
-                  animate={{
-                    textShadow: [
-                      '0 0 10px rgba(6, 182, 212, 0.3)',
-                      '0 0 20px rgba(6, 182, 212, 0.5)',
-                      '0 0 10px rgba(6, 182, 212, 0.3)',
-                    ]
-                  }}
+                  animate={textGlowAnimationCyan}
                   transition={{
                     duration: 2,
-                    repeat: Infinity,
+                    repeat: isMobile ? 0 : Infinity,
                     ease: "easeInOut"
                   }}
                 >

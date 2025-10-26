@@ -1,17 +1,20 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import { Announcement } from '@/lib/supabase';
 import Link from 'next/link';
 import { use } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { useMobileDetect } from '@/hooks/useMobileDetect';
 
 export default function NoticeDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [announcement, setAnnouncement] = useState<Announcement | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const isMobile = useMobileDetect();
 
   useEffect(() => {
     const fetchAnnouncement = async () => {
@@ -81,7 +84,12 @@ export default function NoticeDetailPage({ params }: { params: Promise<{ id: str
       <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 pt-24">
         <div className="max-w-4xl mx-auto">
         {/* 상단 제목 영역 */}
-        <div className="bg-white border border-gray-300 mb-4">
+        <motion.div
+          initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 30 }}
+          animate={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
+          transition={{ duration: isMobile ? 0 : 0.5, ease: "easeOut" }}
+          className="bg-white border border-gray-300 mb-4"
+        >
           <div className="border-b border-gray-300 bg-gray-50 px-8 py-4">
             <h1 className="text-2xl font-bold text-gray-900">
               {announcement.title}
@@ -99,10 +107,15 @@ export default function NoticeDetailPage({ params }: { params: Promise<{ id: str
               )}
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* 내용 영역 */}
-        <div className="bg-white border border-gray-300 mb-4">
+        <motion.div
+          initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 30 }}
+          animate={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
+          transition={{ duration: isMobile ? 0 : 0.5, delay: isMobile ? 0 : 0.1, ease: "easeOut" }}
+          className="bg-white border border-gray-300 mb-4"
+        >
           <div className="px-8 py-12 min-h-[400px]">
             <div 
               className="text-gray-800 leading-relaxed mb-8 prose prose-lg max-w-none"
@@ -119,7 +132,17 @@ export default function NoticeDetailPage({ params }: { params: Promise<{ id: str
                     const downloadUrl = `${file.url}?download=${encodeURIComponent(file.name)}`;
                     
                     return (
-                      <div key={index} className="flex items-center gap-3 px-4 py-3 bg-gray-50 border border-gray-200 rounded">
+                      <motion.div
+                        key={index}
+                        initial={isMobile ? { opacity: 1 } : { opacity: 0, x: -20 }}
+                        animate={isMobile ? { opacity: 1 } : { opacity: 1, x: 0 }}
+                        transition={{
+                          duration: isMobile ? 0 : 0.3,
+                          delay: isMobile ? 0 : 0.2 + index * 0.05,
+                          ease: "easeOut"
+                        }}
+                        className="flex items-center gap-3 px-4 py-3 bg-gray-50 border border-gray-200 rounded"
+                      >
                         <span className="text-xl">
                           {file.type.startsWith('image/') ? '🖼️' : '📄'}
                         </span>
@@ -133,28 +156,33 @@ export default function NoticeDetailPage({ params }: { params: Promise<{ id: str
                         </div>
                         <a
                           href={downloadUrl}
-                          className="text-blue-600 text-sm hover:text-blue-700 px-3 py-1 border border-blue-600 rounded hover:bg-blue-50 transition-colors whitespace-nowrap"
+                          className="text-blue-600 text-sm hover:text-blue-700 px-3 py-1 border border-blue-600 rounded hover:bg-blue-50 transition-colors duration-200 whitespace-nowrap"
                         >
                           다운로드
                         </a>
-                      </div>
+                      </motion.div>
                     );
                   })}
                 </div>
               </div>
             )}
           </div>
-        </div>
+        </motion.div>
 
         {/* 하단 버튼 */}
-        <div className="flex justify-center gap-3">
+        <motion.div
+          initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 20 }}
+          animate={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
+          transition={{ duration: isMobile ? 0 : 0.4, delay: isMobile ? 0 : 0.2, ease: "easeOut" }}
+          className="flex justify-center gap-3"
+        >
           <Link
             href="/notice"
-            className="px-8 py-2.5 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+            className="px-8 py-2.5 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors duration-200"
           >
             목록
           </Link>
-        </div>
+        </motion.div>
         </div>
       </div>
       <Footer />

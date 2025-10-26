@@ -9,10 +9,11 @@ import { useMobileDetect } from "@/hooks/useMobileDetect";
 
 // 상수 정의
 const SCROLL_AMOUNT_RATIO = 0.8;
-const CARD_HOVER_SCALE = 1.04;
-const TITLE_ANIMATION_DURATION = 0.6;
-const CONTAINER_ANIMATION_DURATION = 0.8;
-const CARD_ANIMATION_DURATION = 0.6;
+const CARD_HOVER_SCALE = 1.03;
+const optimizedStyle = {
+  willChange: 'transform' as const,
+  backfaceVisibility: 'hidden' as const
+};
 
 type SubjectBook = {
   id: string;
@@ -24,7 +25,6 @@ type SubjectBook = {
 };
 
 export default function Subjects() {
-  const [isClient, setIsClient] = useState(false);
   const [teams, setTeams] = useState<SubjectBook[]>([]);
   const [loading, setLoading] = useState(true);
   const isMobile = useMobileDetect();
@@ -33,8 +33,6 @@ export default function Subjects() {
   });
 
   useEffect(() => {
-    setIsClient(true);
-    
     // API에서 Subjects 교재 가져오기
     const fetchSubjectBooks = async () => {
       try {
@@ -78,7 +76,7 @@ export default function Subjects() {
           initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 30 }}
           whileInView={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px", amount: 0.2 }}
-          transition={{ duration: isMobile ? 0 : TITLE_ANIMATION_DURATION, ease: "easeOut" }}
+          transition={{ duration: isMobile ? 0 : 0.6, ease: "easeOut" }}
           className="text-3xl sm:text-4xl md:text-5xl text-left font-bold text-gray-900 mb-4 leading-tight tracking-tight"
         >
           VERADI Subjects & Series
@@ -88,31 +86,31 @@ export default function Subjects() {
         <div className="pointer-events-none absolute inset-y-0 left-0 right-0 flex justify-between items-center z-20 px-2 sm:px-4 md:px-6">
           <button
             onClick={() => scroll("left")}
-            disabled={isClient ? !canScrollLeft : false}
-            className={`pointer-events-auto p-2 sm:p-3 rounded-full shadow-md backdrop-blur-sm transition ${
-              isClient && !canScrollLeft
-                ? "bg-gray-200/50 cursor-not-allowed opacity-40"
-                : "bg-white/70 hover:bg-white hover:shadow-lg"
+            disabled={!canScrollLeft}
+            className={`pointer-events-auto p-2 sm:p-3 rounded-full shadow-md backdrop-blur-sm transition-all duration-300 ${
+              canScrollLeft
+                ? "bg-white/70 hover:bg-white hover:shadow-lg hover:scale-110"
+                : "bg-gray-200/50 cursor-not-allowed opacity-40"
             }`}
             aria-label="이전"
           >
-            <ArrowLeft className={`w-5 h-5 sm:w-6 sm:h-6 ${
-              isClient && !canScrollLeft ? "text-gray-400" : "text-gray-700"
+            <ArrowLeft className={`w-5 h-5 sm:w-6 sm:h-6 transition-colors ${
+              canScrollLeft ? "text-gray-700" : "text-gray-400"
             }`} />
           </button>
 
           <button
             onClick={() => scroll("right")}
-            disabled={isClient ? !canScrollRight : false}
-            className={`pointer-events-auto p-2 sm:p-3 rounded-full shadow-md backdrop-blur-sm transition ${
-              isClient && !canScrollRight
-                ? "bg-gray-200/50 cursor-not-allowed opacity-40"
-                : "bg-white/70 hover:bg-white hover:shadow-lg"
+            disabled={!canScrollRight}
+            className={`pointer-events-auto p-2 sm:p-3 rounded-full shadow-md backdrop-blur-sm transition-all duration-300 ${
+              canScrollRight
+                ? "bg-white/70 hover:bg-white hover:shadow-lg hover:scale-110"
+                : "bg-gray-200/50 cursor-not-allowed opacity-40"
             }`}
             aria-label="다음"
           >
-            <ArrowRight className={`w-5 h-5 sm:w-6 sm:h-6 ${
-              isClient && !canScrollRight ? "text-gray-400" : "text-gray-700"
+            <ArrowRight className={`w-5 h-5 sm:w-6 sm:h-6 transition-colors ${
+              canScrollRight ? "text-gray-700" : "text-gray-400"
             }`} />
           </button>
         </div>
@@ -127,15 +125,19 @@ export default function Subjects() {
             <p className="text-gray-500">등록된 교재가 없습니다</p>
           </div>
         ) : (
-          <motion.div
-            ref={scrollRef}
-            initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 50 }}
-            whileInView={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px", amount: 0.2 }}
-            transition={{ duration: isMobile ? 0 : CONTAINER_ANIMATION_DURATION, ease: "easeOut" }}
-            className="flex gap-6 sm:gap-8 md:gap-10 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-8 hide-scrollbar overflow-visible"
-            style={{ willChange: 'transform' }}
-          >
+        <motion.div
+          ref={scrollRef}
+          initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 30 }}
+          whileInView={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px", amount: 0.2 }}
+          transition={{ duration: isMobile ? 0 : 0.5, ease: "easeOut" }}
+          className="flex gap-6 sm:gap-8 md:gap-10 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-8 hide-scrollbar overflow-visible"
+          style={{
+            ...optimizedStyle,
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none'
+          }}
+        >
             {teams.map((team, idx) => (
               <motion.div
                 key={team.id}
@@ -143,15 +145,15 @@ export default function Subjects() {
                 whileInView={isMobile ? { opacity: 1 } : { opacity: 1, x: 0 }}
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{ 
-                  duration: isMobile ? 0 : CARD_ANIMATION_DURATION * 0.8, 
-                  delay: isMobile ? 0 : idx * 0.08,
+                  duration: isMobile ? 0 : 0.4, 
+                  delay: isMobile ? 0 : Math.min(idx * 0.06, 0.3),
                   ease: "easeOut" 
                 }}
                 whileHover={isMobile ? {} : { scale: CARD_HOVER_SCALE }}
                 className={`relative flex-shrink-0 w-[320px] sm:w-[360px] md:w-[400px] lg:w-[420px]
                            bg-white rounded-3xl shadow-lg border border-gray-100
-                           overflow-visible snap-center flex flex-col ${isMobile ? '' : 'hover:shadow-2xl transition-all duration-500'}`}
-                style={{ willChange: 'transform', backfaceVisibility: 'hidden' }}
+                           overflow-visible snap-center flex flex-col ${isMobile ? '' : 'hover:shadow-2xl transition-shadow duration-300'}`}
+                style={optimizedStyle}
               >
                 {/* 상단 텍스트 영역 */}
                 <div className="flex-shrink-0 p-6 sm:p-8 pb-4 sm:pb-6">
@@ -173,9 +175,8 @@ export default function Subjects() {
                       transition={{ duration: 0.6, ease: "easeInOut" }}
                       className="relative w-40 h-56 sm:w-52 sm:h-72 md:w-60 md:h-80 lg:w-64 lg:h-[22rem] transform-style-preserve-3d overflow-visible"
                       style={{
-                        transformOrigin: "center center",
-                        willChange: 'transform',
-                        backfaceVisibility: 'hidden'
+                        ...optimizedStyle,
+                        transformOrigin: "center center"
                       }}
                     >
                       {/* 앞표지 */}
@@ -188,10 +189,11 @@ export default function Subjects() {
                           alt={`${team.subject} 앞표지`}
                           fill
                           sizes="(max-width: 640px) 160px, (max-width: 768px) 208px, (max-width: 1024px) 240px, 256px"
-                          priority={idx === 0}
                           className="object-cover"
-                          quality={85}
-                          loading={idx === 0 ? "eager" : "lazy"}
+                          quality={75}
+                          loading={idx < 2 ? "eager" : "lazy"}
+                          placeholder="blur"
+                          blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mN8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg=="
                         />
                       </div>
                     </motion.div>
@@ -204,7 +206,7 @@ export default function Subjects() {
 
                 {/* 하단 버튼 */}
                 <div className="flex-shrink-0 flex justify-between items-center gap-3 px-6 sm:px-8 py-4 sm:py-6 border-t border-gray-100 bg-white/70 backdrop-blur-sm rounded-b-3xl">
-                  <button className="flex items-center gap-1.5 sm:gap-2 px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-semibold text-gray-700 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl hover:from-gray-100 hover:to-gray-200 transition-all duration-300 shadow-sm hover:shadow-md border border-gray-200">
+                  <button className="flex items-center gap-1.5 sm:gap-2 px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-semibold text-gray-700 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl hover:from-gray-100 hover:to-gray-200 transition-all duration-200 shadow-sm hover:shadow-md border border-gray-200">
                     <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     <span>팀 소개</span>
                   </button>
@@ -212,7 +214,7 @@ export default function Subjects() {
                     href={team.purchase_link || '#'}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 sm:gap-2 px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-sky-500 to-sky-600 rounded-xl hover:from-sky-600 hover:to-sky-700 transition-all duration-300 shadow-md hover:shadow-lg hover:scale-105"
+                    className="flex items-center gap-1.5 sm:gap-2 px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-sky-500 to-sky-600 rounded-xl hover:from-sky-600 hover:to-sky-700 transition-all duration-200 shadow-md hover:shadow-lg"
                   >
                     <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     <span>구입하기</span>

@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useMobileDetect } from "@/hooks/useMobileDetect";
 
 // 핵심 멤버 데이터 (이미지 + 역할 표시)
 const coreMembers = [
@@ -48,11 +49,9 @@ const teamMembers = [
   { name: "서유진", education: "이화여대 수학교육학과", hasImage: false }
 ];
 
-// 애니메이션 상수
-const TITLE_ANIMATION_DURATION = 0.6;
-const CARD_ANIMATION_DURATION = 0.5;
-
 export default function VeradiMakers() {
+  const isMobile = useMobileDetect();
+
   return (
     <section className="relative bg-white py-20 sm:py-28 md:py-36 px-4 sm:px-6 overflow-hidden">
       {/* 배경 장식 */}
@@ -70,10 +69,10 @@ export default function VeradiMakers() {
       <div className="max-w-7xl mx-auto relative z-10">
         {/* 섹션 제목 */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 30 }}
+          whileInView={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: TITLE_ANIMATION_DURATION, ease: "easeOut" }}
+          transition={{ duration: isMobile ? 0 : 0.5, ease: "easeOut" }}
           className="text-center mb-16 sm:mb-20"
         >
           <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-4">
@@ -88,25 +87,25 @@ export default function VeradiMakers() {
 
         {/* 핵심 인물 그리드 */}
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 40 }}
+          whileInView={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+          transition={{ duration: isMobile ? 0 : 0.5, ease: "easeOut" }}
           className="mb-8 sm:mb-12"
         >
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             {coreMembers.map((member, idx) => (
               <motion.div
                 key={member.name}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
+                initial={isMobile ? { opacity: 1 } : { opacity: 0, scale: 0.9 }}
+                whileInView={isMobile ? { opacity: 1 } : { opacity: 1, scale: 1 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ 
-                  duration: CARD_ANIMATION_DURATION, 
-                  delay: idx * 0.05,
+                  duration: isMobile ? 0 : 0.4, 
+                  delay: isMobile ? 0 : Math.min(idx * 0.05, 0.15),
                   ease: "easeOut" 
                 }}
-                className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100 text-center group p-6 sm:p-8"
+                className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-200 border border-gray-100 text-center group p-6 sm:p-8"
               >
                 {/* 이미지 - 빈 공간 */}
                 <div className="w-24 h-24 sm:w-32 sm:h-32 mx-auto mb-4 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden group-hover:scale-105 transition-transform duration-300 relative">
@@ -134,24 +133,24 @@ export default function VeradiMakers() {
 
         {/* 일반 멤버 그리드 */}
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 40 }}
+          whileInView={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+          transition={{ duration: isMobile ? 0 : 0.5, ease: "easeOut" }}
         >
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 sm:gap-6">
             {teamMembers.map((member, idx) => (
               <motion.div
                 key={member.name}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
+                initial={isMobile ? { opacity: 1 } : { opacity: 0, scale: 0.9 }}
+                whileInView={isMobile ? { opacity: 1 } : { opacity: 1, scale: 1 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ 
-                  duration: CARD_ANIMATION_DURATION, 
-                  delay: idx * 0.05,
+                  duration: isMobile ? 0 : 0.4, 
+                  delay: isMobile ? 0 : Math.min(idx * 0.05, 0.3),
                   ease: "easeOut" 
                 }}
-                className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100 text-center group p-4"
+                className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-200 border border-gray-100 text-center group p-4"
               >
                 {/* 이름 플레이스홀더 */}
                 <div className="flex justify-center mb-2">

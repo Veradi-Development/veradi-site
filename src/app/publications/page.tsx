@@ -11,10 +11,11 @@ import { useMobileDetect } from "@/hooks/useMobileDetect";
 
 // 상수 정의
 const SCROLL_AMOUNT_RATIO = 0.8;
-const CARD_HOVER_SCALE = 1.04;
-const TITLE_ANIMATION_DURATION = 0.6;
-const CONTAINER_ANIMATION_DURATION = 0.8;
-const CARD_ANIMATION_DURATION = 0.6;
+const CARD_HOVER_SCALE = 1.03;
+const optimizedStyle = {
+  willChange: 'transform' as const,
+  backfaceVisibility: 'hidden' as const
+};
 
 // 교재 시리즈 데이터 타입
 type BookData = {
@@ -41,26 +42,21 @@ type PublicationSection = {
 };
 
 // 교재 섹션 컴포넌트
-function BookSeriesSection({ 
-  title, 
+function BookSeriesSection({
+  title,
   books,
   guideUrl,
   useSubjectsBackground = false
-}: { 
-  title: string; 
+}: {
+  title: string;
   books: BookData[];
   guideUrl?: string | null;
   useSubjectsBackground?: boolean;
 }) {
-  const [isClient, setIsClient] = useState(false);
   const isMobile = useMobileDetect();
   const { scrollRef, canScrollLeft, canScrollRight, scroll } = useHorizontalScroll({
     scrollAmountRatio: SCROLL_AMOUNT_RATIO,
   });
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
   
   if (books.length === 0) return null;
 
@@ -94,7 +90,7 @@ function BookSeriesSection({
           initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 30 }}
           whileInView={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px", amount: 0.2 }}
-          transition={{ duration: isMobile ? 0 : TITLE_ANIMATION_DURATION, ease: "easeOut" }}
+          transition={{ duration: isMobile ? 0 : 0.5, ease: "easeOut" }}
           className="flex items-center justify-between mb-4"
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 leading-tight tracking-tight">
@@ -121,31 +117,31 @@ function BookSeriesSection({
         <div className="pointer-events-none absolute inset-y-0 left-0 right-0 flex justify-between items-center z-20 px-2 sm:px-4 md:px-6">
           <button
             onClick={() => scroll("left")}
-            disabled={isClient ? !canScrollLeft : false}
-            className={`pointer-events-auto p-2 sm:p-3 rounded-full shadow-md backdrop-blur-sm transition ${
-              isClient && !canScrollLeft
-                ? "bg-gray-200/50 cursor-not-allowed opacity-40"
-                : "bg-white/70 hover:bg-white hover:shadow-lg"
+            disabled={!canScrollLeft}
+            className={`pointer-events-auto p-2 sm:p-3 rounded-full shadow-md backdrop-blur-sm transition-all duration-300 ${
+              canScrollLeft
+                ? "bg-white/70 hover:bg-white hover:shadow-lg hover:scale-110"
+                : "bg-gray-200/50 cursor-not-allowed opacity-40"
             }`}
             aria-label="이전"
           >
-            <ArrowLeft className={`w-5 h-5 sm:w-6 sm:h-6 ${
-              isClient && !canScrollLeft ? "text-gray-400" : "text-gray-700"
+            <ArrowLeft className={`w-5 h-5 sm:w-6 sm:h-6 transition-colors ${
+              canScrollLeft ? "text-gray-700" : "text-gray-400"
             }`} />
           </button>
 
           <button
             onClick={() => scroll("right")}
-            disabled={isClient ? !canScrollRight : false}
-            className={`pointer-events-auto p-2 sm:p-3 rounded-full shadow-md backdrop-blur-sm transition ${
-              isClient && !canScrollRight
-                ? "bg-gray-200/50 cursor-not-allowed opacity-40"
-                : "bg-white/70 hover:bg-white hover:shadow-lg"
+            disabled={!canScrollRight}
+            className={`pointer-events-auto p-2 sm:p-3 rounded-full shadow-md backdrop-blur-sm transition-all duration-300 ${
+              canScrollRight
+                ? "bg-white/70 hover:bg-white hover:shadow-lg hover:scale-110"
+                : "bg-gray-200/50 cursor-not-allowed opacity-40"
             }`}
             aria-label="다음"
           >
-            <ArrowRight className={`w-5 h-5 sm:w-6 sm:h-6 ${
-              isClient && !canScrollRight ? "text-gray-400" : "text-gray-700"
+            <ArrowRight className={`w-5 h-5 sm:w-6 sm:h-6 transition-colors ${
+              canScrollRight ? "text-gray-700" : "text-gray-400"
             }`} />
           </button>
         </div>
@@ -153,15 +149,15 @@ function BookSeriesSection({
         {/* 수평 스크롤 카드 컨테이너 */}
         <motion.div
           ref={scrollRef}
-          initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 50 }}
+          initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 30 }}
           whileInView={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px", amount: 0.2 }}
-          transition={{ duration: isMobile ? 0 : CONTAINER_ANIMATION_DURATION, ease: "easeOut" }}
+          transition={{ duration: isMobile ? 0 : 0.5, ease: "easeOut" }}
           className="flex gap-6 sm:gap-8 md:gap-10 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-8 overflow-visible"
           style={{
+            ...optimizedStyle,
             scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
-            willChange: 'transform',
+            msOverflowStyle: 'none'
           }}
         >
           {books.map((book, idx) => (
@@ -171,15 +167,15 @@ function BookSeriesSection({
               whileInView={isMobile ? { opacity: 1 } : { opacity: 1, x: 0 }}
               viewport={{ once: true, amount: 0.3 }}
               transition={{ 
-                duration: isMobile ? 0 : CARD_ANIMATION_DURATION * 0.8, 
-                delay: isMobile ? 0 : idx * 0.08,
+                duration: isMobile ? 0 : 0.4, 
+                delay: isMobile ? 0 : Math.min(idx * 0.06, 0.3),
                 ease: "easeOut" 
               }}
               whileHover={isMobile ? {} : { scale: CARD_HOVER_SCALE }}
               className={`relative flex-shrink-0 w-[320px] sm:w-[360px] md:w-[400px] lg:w-[420px]
                          bg-white rounded-3xl shadow-lg border border-gray-100
-                         overflow-visible snap-center flex flex-col ${isMobile ? '' : 'hover:shadow-2xl transition-all duration-500'}`}
-              style={{ willChange: 'transform', backfaceVisibility: 'hidden' }}
+                         overflow-visible snap-center flex flex-col ${isMobile ? '' : 'hover:shadow-2xl transition-shadow duration-300'}`}
+              style={optimizedStyle}
             >
               {/* 상단 텍스트 영역 */}
               <div className="flex-shrink-0 p-6 sm:p-8 pb-4 sm:pb-6">
@@ -198,9 +194,8 @@ function BookSeriesSection({
                     transition={{ duration: 0.6, ease: "easeInOut" }}
                     className="relative w-40 h-56 sm:w-52 sm:h-72 md:w-60 md:h-80 lg:w-64 lg:h-[22rem] transform-style-preserve-3d overflow-visible"
                     style={{
-                      transformOrigin: "center center",
-                      willChange: 'transform',
-                      backfaceVisibility: 'hidden'
+                      ...optimizedStyle,
+                      transformOrigin: "center center"
                     }}
                   >
                     {/* 앞표지 */}
@@ -213,10 +208,11 @@ function BookSeriesSection({
                         alt={`${book.subject} 앞표지`}
                         fill
                         sizes="(max-width: 640px) 160px, (max-width: 768px) 208px, (max-width: 1024px) 240px, 256px"
-                        priority={idx === 0}
                         className="object-cover"
-                        quality={85}
-                        loading={idx === 0 ? "eager" : "lazy"}
+                        quality={75}
+                        loading={idx < 2 ? "eager" : "lazy"}
+                        placeholder="blur"
+                        blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mN8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg=="
                       />
                     </div>
                   </motion.div>
@@ -233,7 +229,7 @@ function BookSeriesSection({
                   href={book.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 sm:gap-2 px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-sky-500 to-sky-600 rounded-xl hover:from-sky-600 hover:to-sky-700 transition-all duration-300 shadow-md hover:shadow-lg hover:scale-105"
+                  className="flex items-center gap-1.5 sm:gap-2 px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-sky-500 to-sky-600 rounded-xl hover:from-sky-600 hover:to-sky-700 transition-all duration-200 shadow-md hover:shadow-lg"
                 >
                   <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   <span>구입하기</span>
@@ -245,11 +241,9 @@ function BookSeriesSection({
       </div>
 
       {/* 스크롤바 숨김 */}
-      <style jsx global>{`
+      <style jsx>{`
         .overflow-x-auto::-webkit-scrollbar {
-          display: none !important;
-          width: 0 !important;
-          height: 0 !important;
+          display: none;
         }
       `}</style>
     </section>
@@ -264,8 +258,6 @@ export default function Publications() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-    
     // 데이터 로드
     const fetchData = async () => {
       try {
@@ -360,7 +352,7 @@ export default function Publications() {
           <motion.div
             initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 30 }}
             animate={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
-            transition={{ duration: isMobile ? 0 : 0.6 }}
+            transition={{ duration: isMobile ? 0 : 0.5 }}
             className="text-left mb-8 sm:mb-12"
           >
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 tracking-tight leading-tight">
@@ -370,9 +362,9 @@ export default function Publications() {
 
           {/* 메인 이미지 + 텍스트 오버레이 섹션 */}
           <motion.div
-            initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 50 }}
+            initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 30 }}
             animate={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
-            transition={{ duration: isMobile ? 0 : 0.8, delay: isMobile ? 0 : 0.2 }}
+            transition={{ duration: isMobile ? 0 : 0.5, delay: isMobile ? 0 : 0.1 }}
             className="relative rounded-3xl overflow-hidden shadow-2xl"
           >
             {/* 배경 이미지 - 책 들고 있는 사람 */}
@@ -401,7 +393,7 @@ export default function Publications() {
                   <motion.div
                     initial={isMobile ? { opacity: 1 } : { opacity: 0, x: -30 }}
                     animate={isMobile ? { opacity: 1 } : { opacity: 1, x: 0 }}
-                    transition={{ duration: isMobile ? 0 : 0.8, delay: isMobile ? 0 : 0.4 }}
+                    transition={{ duration: isMobile ? 0 : 0.5, delay: isMobile ? 0 : 0.2 }}
                     className="space-y-5 sm:space-y-6 text-center"
                   >
                     <div>
@@ -418,7 +410,7 @@ export default function Publications() {
                           href={guide.video_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-sky-600 hover:bg-sky-700 text-white font-semibold rounded-full transition-all duration-300 hover:shadow-xl hover:scale-105 group"
+                          className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-sky-600 hover:bg-sky-700 text-white font-semibold rounded-full transition-all duration-200 hover:shadow-xl group"
                         >
                           <Play className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" />
                           <span className="text-sm sm:text-base">동영상 보기</span>
