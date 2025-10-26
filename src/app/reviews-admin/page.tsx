@@ -45,7 +45,12 @@ export default function AdminReviewsPage() {
 
   const fetchReviews = async () => {
     try {
-      const response = await fetch('/api/reviews');
+      const response = await fetch('/api/reviews', {
+        cache: 'no-store', // 관리자 페이지는 항상 최신 데이터 표시
+        headers: {
+          'Cache-Control': 'no-cache',
+        },
+      });
       if (response.ok) {
         const data = await response.json();
         if (Array.isArray(data)) {

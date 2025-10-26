@@ -55,7 +55,12 @@ export default function AdminBooksPage() {
 
   const fetchBooks = async () => {
     try {
-      const response = await fetch('/api/books');
+      const response = await fetch('/api/books', {
+        cache: 'no-store', // 관리자 페이지는 항상 최신 데이터 표시
+        headers: {
+          'Cache-Control': 'no-cache',
+        },
+      });
       if (response.ok) {
         const data = await response.json();
         if (Array.isArray(data)) {

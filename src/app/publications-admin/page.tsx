@@ -99,7 +99,12 @@ export default function AdminPublicationsPage() {
 
   const fetchGuide = async () => {
     try {
-      const response = await fetch('/api/publication-guide');
+      const response = await fetch('/api/publication-guide', {
+        cache: 'no-store', // 관리자 페이지는 항상 최신 데이터 표시
+        headers: {
+          'Cache-Control': 'no-cache',
+        },
+      });
       if (response.ok) {
         const data = await response.json();
         setGuide(data);
@@ -117,7 +122,12 @@ export default function AdminPublicationsPage() {
 
   const fetchSections = async () => {
     try {
-      const response = await fetch('/api/publication-sections');
+      const response = await fetch('/api/publication-sections', {
+        cache: 'no-store', // 관리자 페이지는 항상 최신 데이터 표시
+        headers: {
+          'Cache-Control': 'no-cache',
+        },
+      });
       if (response.ok) {
         const data = await response.json();
         if (Array.isArray(data)) {
@@ -134,7 +144,12 @@ export default function AdminPublicationsPage() {
   const fetchBooks = async () => {
     try {
       // publications 교재 가져오기 (type='publication')
-      const response = await fetch('/api/books?type=publication');
+      const response = await fetch('/api/books?type=publication', {
+        cache: 'no-store', // 관리자 페이지는 항상 최신 데이터 표시
+        headers: {
+          'Cache-Control': 'no-cache',
+        },
+      });
       if (response.ok) {
         const data = await response.json();
         if (Array.isArray(data)) {

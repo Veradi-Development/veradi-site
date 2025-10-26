@@ -44,7 +44,12 @@ export default function AdminAnnouncementsPage() {
 
   const fetchAnnouncements = async () => {
     try {
-      const response = await fetch('/api/announcements');
+      const response = await fetch('/api/announcements', {
+        cache: 'no-store', // 관리자 페이지는 항상 최신 데이터 표시
+        headers: {
+          'Cache-Control': 'no-cache',
+        },
+      });
       const data = await response.json();
       
       // 데이터가 배열인지 확인
