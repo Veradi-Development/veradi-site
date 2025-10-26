@@ -45,10 +45,13 @@ export default function AdminReviewsPage() {
 
   const fetchReviews = async () => {
     try {
-      const response = await fetch('/api/reviews', {
-        cache: 'no-store', // 관리자 페이지는 항상 최신 데이터 표시
+      // 타임스탬프로 캐시 완전 우회
+      const response = await fetch(`/api/reviews?t=${Date.now()}`, {
+        cache: 'no-store',
         headers: {
-          'Cache-Control': 'no-cache',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
         },
       });
       if (response.ok) {

@@ -99,10 +99,13 @@ export default function AdminPublicationsPage() {
 
   const fetchGuide = async () => {
     try {
-      const response = await fetch('/api/publication-guide', {
-        cache: 'no-store', // 관리자 페이지는 항상 최신 데이터 표시
+      // 타임스탬프로 캐시 완전 우회
+      const response = await fetch(`/api/publication-guide?t=${Date.now()}`, {
+        cache: 'no-store',
         headers: {
-          'Cache-Control': 'no-cache',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
         },
       });
       if (response.ok) {
@@ -122,10 +125,13 @@ export default function AdminPublicationsPage() {
 
   const fetchSections = async () => {
     try {
-      const response = await fetch('/api/publication-sections', {
-        cache: 'no-store', // 관리자 페이지는 항상 최신 데이터 표시
+      // 타임스탬프로 캐시 완전 우회
+      const response = await fetch(`/api/publication-sections?t=${Date.now()}`, {
+        cache: 'no-store',
         headers: {
-          'Cache-Control': 'no-cache',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
         },
       });
       if (response.ok) {
@@ -143,11 +149,13 @@ export default function AdminPublicationsPage() {
 
   const fetchBooks = async () => {
     try {
-      // publications 교재 가져오기 (type='publication')
-      const response = await fetch('/api/books?type=publication', {
-        cache: 'no-store', // 관리자 페이지는 항상 최신 데이터 표시
+      // publications 교재 가져오기 (type='publication') + 타임스탬프로 캐시 완전 우회
+      const response = await fetch(`/api/books?type=publication&t=${Date.now()}`, {
+        cache: 'no-store',
         headers: {
-          'Cache-Control': 'no-cache',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
         },
       });
       if (response.ok) {
