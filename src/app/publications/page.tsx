@@ -6,6 +6,7 @@ import { ArrowLeft, ArrowRight, ShoppingCart, Play } from "lucide-react";
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Reviews from "@/components/Reviews";
 import { useHorizontalScroll } from "@/hooks/useHorizontalScroll";
 import { useMobileDetect } from "@/hooks/useMobileDetect";
 
@@ -32,6 +33,7 @@ type PublicationGuide = {
   main_title: string;
   hero_title: string;
   video_url: string | null;
+  hero_image_url: string | null;
 };
 
 type PublicationSection = {
@@ -369,23 +371,24 @@ export default function Publications() {
           >
             {/* 배경 이미지 - 책 들고 있는 사람 */}
             <div className="relative w-full h-[400px] sm:h-[450px] md:h-[500px] lg:h-[550px]">
-              {/* 임시 배경 - 실제 이미지로 교체 예정 */}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-100">
-                {/* 실제 이미지를 사용할 때는 아래처럼 교체:
+              {guide?.hero_image_url ? (
                 <Image 
-                  src="/images/guide-hero.jpg" 
-                  alt="VERADI 교재를 들고 있는 사람"
+                  src={guide.hero_image_url} 
+                  alt="VERADI 완벽활용가이드"
                   fill
                   className="object-cover"
                   priority
-                /> */}
-                <div className="absolute inset-0 flex items-center justify-end pr-8 sm:pr-16 md:pr-24 lg:pr-32">
-                  <div className="text-gray-400 text-center">
-                    <div className="text-6xl sm:text-8xl mb-4">📚</div>
-                    <p className="text-sm sm:text-base">책 들고 있는 사진<br/>(준비 중)</p>
+                />
+              ) : (
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-100">
+                  <div className="absolute inset-0 flex items-center justify-end pr-8 sm:pr-16 md:pr-24 lg:pr-32">
+                    <div className="text-gray-400 text-center">
+                      <div className="text-6xl sm:text-8xl mb-4">📚</div>
+                      <p className="text-sm sm:text-base">책 들고 있는 사진<br/>(준비 중)</p>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
 
               {/* 왼쪽 텍스트 + 버튼 오버레이 */}
               <div className="absolute inset-0 flex items-center">
@@ -435,6 +438,9 @@ export default function Publications() {
           useSubjectsBackground={section.use_subjects_background}
         />
       ))}
+
+      {/* 학생 후기 섹션 */}
+      <Reviews />
 
       <Footer />
     </main>

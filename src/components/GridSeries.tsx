@@ -109,7 +109,7 @@ export default function GridSeries() {
   const [subjects, setSubjects] = useState<GridBook[]>([]);
   const [loading, setLoading] = useState(true);
   const isMobile = useMobileDetect();
-  const { scrollRef, canScrollLeft, canScrollRight, scroll } = useHorizontalScroll({
+  const { scrollRef, canScrollLeft, canScrollRight, scroll, recheckScroll } = useHorizontalScroll({
     scrollAmountRatio: SCROLL_AMOUNT_RATIO,
   });
 
@@ -132,6 +132,18 @@ export default function GridSeries() {
 
     fetchGridBooks();
   }, []);
+
+  // 데이터 로드 후 스크롤 상태 재체크
+  useEffect(() => {
+    if (subjects.length > 0) {
+      const timeouts = [
+        setTimeout(() => recheckScroll(), 100),
+        setTimeout(() => recheckScroll(), 300),
+        setTimeout(() => recheckScroll(), 500),
+      ];
+      return () => timeouts.forEach(t => clearTimeout(t));
+    }
+  }, [subjects, recheckScroll]);
 
   return (
     <section

@@ -169,6 +169,36 @@ export default function AdminPublicationsPage() {
     }
   };
 
+  const handleGuideImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    try {
+      const uploadFormData = new FormData();
+      uploadFormData.append('file', file);
+
+      const response = await fetch(`/api/upload?password=${encodeURIComponent(ADMIN_PASSWORD)}`, {
+        method: 'POST',
+        body: uploadFormData,
+      });
+
+      if (!response.ok) {
+        throw new Error('이미지 업로드 실패');
+      }
+
+      const data = await response.json();
+      setGuideForm(prev => ({ ...prev, hero_image_url: data.url }));
+      
+      alert('이미지가 업로드되었습니다');
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      alert('이미지 업로드 중 오류가 발생했습니다');
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
   const handleGuideSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -502,15 +532,31 @@ export default function AdminPublicationsPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    히어로 이미지 URL
+                    히어로 이미지
                   </label>
-                  <input
-                    type="url"
-                    value={guideForm.hero_image_url}
-                    onChange={(e) => setGuideForm({ ...guideForm, hero_image_url: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                    placeholder="/images/guide-hero.jpg"
-                  />
+                  <div className="space-y-2">
+                    <div className="flex gap-2">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleGuideImageUpload}
+                        disabled={uploadingImage}
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+                      />
+                      {uploadingImage && <span className="text-sm text-blue-600">업로드 중...</span>}
+                    </div>
+                    <input
+                      type="url"
+                      value={guideForm.hero_image_url}
+                      onChange={(e) => setGuideForm({ ...guideForm, hero_image_url: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+                      placeholder="또는 URL 직접 입력: /images/guide-hero.jpg"
+                    />
+                    {guideForm.hero_image_url && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={guideForm.hero_image_url} alt="히어로 이미지 미리보기" className="w-full max-w-md h-48 object-cover rounded border" />
+                    )}
+                  </div>
                 </div>
               </div>
 

@@ -75,7 +75,7 @@ export default function Hero() {
           className="mb-4 sm:mb-5 md:mb-6"
         >
           <h1 className="text-5xl sm:text-6xl md:text-6xl lg:text-7xl xl:text-8xl font-bold bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-400 bg-clip-text text-transparent leading-tight">
-            zero to mastery
+            Zero To Mastery
           </h1>
         </motion.div>
 

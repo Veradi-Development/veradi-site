@@ -9,6 +9,7 @@ interface UseHorizontalScrollReturn {
   canScrollLeft: boolean;
   canScrollRight: boolean;
   scroll: (direction: "left" | "right") => void;
+  recheckScroll: () => void;
 }
 
 export function useHorizontalScroll(
@@ -21,10 +22,19 @@ export function useHorizontalScroll(
 
   const checkScrollPosition = useCallback(() => {
     if (!scrollRef.current) return;
-    const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+    
+    const container = scrollRef.current;
+    const scrollLeft = Math.round(container.scrollLeft);
+    const scrollWidth = container.scrollWidth;
+    const clientWidth = container.clientWidth;
+    const maxScrollLeft = scrollWidth - clientWidth;
+    
+    // tolerance 1px로 감소
+    const isAtStart = scrollLeft <= 1;
+    const isAtEnd = scrollLeft >= maxScrollLeft - 1;
 
-    const newCanScrollLeft = scrollLeft > 1;
-    const newCanScrollRight = scrollLeft < scrollWidth - clientWidth - 2;
+    const newCanScrollLeft = !isAtStart;
+    const newCanScrollRight = !isAtEnd;
 
     setCanScrollLeft(newCanScrollLeft);
     setCanScrollRight(newCanScrollRight);
@@ -47,12 +57,40 @@ export function useHorizontalScroll(
       subtree: true,
     });
 
-    // 스크롤 이벤트
-    container.addEventListener("scroll", checkScrollPosition, { passive: true });
-    container.addEventListener("scrollend", checkScrollPosition, { passive: true });
+    // 스크롤 이벤트 (throttle 적용)
+    let scrollTimeout: NodeJS.Timeout | null = null;
+    const handleScroll = () => {
+      // 즉시 체크
+      checkScrollPosition();
+      
+      // 스크롤 끝났을 때도 체크
+      if (scrollTimeout) clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        checkScrollPosition();
+      }, 150);
+    };
+
+    container.addEventListener("scroll", handleScroll, { passive: true });
+
+    // 휠 이벤트: 세로 스크롤 → 가로 스크롤 변환 (트랙패드 지원)
+    const handleWheel = (e: WheelEvent) => {
+      // deltaX가 있으면 이미 가로 스크롤 중
+      if (Math.abs(e.deltaX) > 0) return;
+      
+      // deltaY가 있으면 가로로 변환
+      if (Math.abs(e.deltaY) > 0) {
+        e.preventDefault();
+        container.scrollLeft += e.deltaY;
+        checkScrollPosition();
+      }
+    };
+
+    container.addEventListener("wheel", handleWheel, { passive: false });
 
     // 리사이즈 이벤트
-    const handleResize = () => checkScrollPosition();
+    const handleResize = () => {
+      checkScrollPosition();
+    };
     window.addEventListener("resize", handleResize);
 
     // 약간의 딜레이 후 다시 체크 (이미지 로딩 등을 위해)
@@ -66,10 +104,11 @@ export function useHorizontalScroll(
 
     return () => {
       observer.disconnect();
-      container.removeEventListener("scroll", checkScrollPosition);
-      container.removeEventListener("scrollend", checkScrollPosition);
+      container.removeEventListener("scroll", handleScroll);
+      container.removeEventListener("wheel", handleWheel);
       window.removeEventListener("resize", handleResize);
       timeoutIds.forEach(id => clearTimeout(id));
+      if (scrollTimeout) clearTimeout(scrollTimeout);
     };
   }, [checkScrollPosition]);
 
@@ -81,8 +120,10 @@ export function useHorizontalScroll(
         : scrollRef.current.clientWidth * scrollAmountRatio;
     scrollRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
     
-    // 스크롤 완료 후 상태 업데이트
-    setTimeout(() => checkScrollPosition(), 500);
+    // 스크롤 완료 후 상태 업데이트 (여러 번 체크)
+    setTimeout(() => checkScrollPosition(), 300);
+    setTimeout(() => checkScrollPosition(), 600);
+    setTimeout(() => checkScrollPosition(), 1000);
   }, [scrollAmountRatio, checkScrollPosition]);
 
   return {
@@ -90,6 +131,6 @@ export function useHorizontalScroll(
     canScrollLeft,
     canScrollRight,
     scroll,
+    recheckScroll: checkScrollPosition,
   };
 }
-

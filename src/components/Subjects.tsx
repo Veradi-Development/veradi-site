@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Users, ShoppingCart } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useHorizontalScroll } from "@/hooks/useHorizontalScroll";
 import { useMobileDetect } from "@/hooks/useMobileDetect";
@@ -28,7 +29,7 @@ export default function Subjects() {
   const [teams, setTeams] = useState<SubjectBook[]>([]);
   const [loading, setLoading] = useState(true);
   const isMobile = useMobileDetect();
-  const { scrollRef, canScrollLeft, canScrollRight, scroll } = useHorizontalScroll({
+  const { scrollRef, canScrollLeft, canScrollRight, scroll, recheckScroll } = useHorizontalScroll({
     scrollAmountRatio: SCROLL_AMOUNT_RATIO,
   });
 
@@ -52,6 +53,18 @@ export default function Subjects() {
 
     fetchSubjectBooks();
   }, []);
+
+  // 데이터 로드 후 스크롤 상태 재체크
+  useEffect(() => {
+    if (teams.length > 0) {
+      const timeouts = [
+        setTimeout(() => recheckScroll(), 100),
+        setTimeout(() => recheckScroll(), 300),
+        setTimeout(() => recheckScroll(), 500),
+      ];
+      return () => timeouts.forEach(t => clearTimeout(t));
+    }
+  }, [teams, recheckScroll]);
 
   return (
     // ✅ 섹션의 overflow-visible로 변경
@@ -206,10 +219,13 @@ export default function Subjects() {
 
                 {/* 하단 버튼 */}
                 <div className="flex-shrink-0 flex justify-between items-center gap-3 px-6 sm:px-8 py-4 sm:py-6 border-t border-gray-100 bg-white/70 backdrop-blur-sm rounded-b-3xl">
-                  <button className="flex items-center gap-1.5 sm:gap-2 px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-semibold text-gray-700 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl hover:from-gray-100 hover:to-gray-200 transition-all duration-200 shadow-sm hover:shadow-md border border-gray-200">
+                  <Link 
+                    href="/about#veradi-makers"
+                    className="flex items-center gap-1.5 sm:gap-2 px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-semibold text-gray-700 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl hover:from-gray-100 hover:to-gray-200 transition-all duration-200 shadow-sm hover:shadow-md border border-gray-200"
+                  >
                     <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     <span>팀 소개</span>
-                  </button>
+                  </Link>
                   <a
                     href={team.purchase_link || '#'}
                     target="_blank"

@@ -53,7 +53,7 @@ export default function VeradiMakers() {
   const isMobile = useMobileDetect();
 
   return (
-    <section className="relative bg-white py-20 sm:py-28 md:py-36 px-4 sm:px-6 overflow-hidden">
+    <section id="veradi-makers" className="relative bg-white py-20 sm:py-28 md:py-36 px-4 sm:px-6 overflow-hidden">
       {/* 배경 장식 */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div 
@@ -77,7 +77,7 @@ export default function VeradiMakers() {
         >
           <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-4">
             <span className="bg-gradient-to-r from-sky-600 to-blue-600 bg-clip-text text-transparent">
-              VERADI Makers
+              VERADI MAKERS
             </span>
           </h2>
           <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, memo } from 'react';
 import { motion } from 'framer-motion';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Announcement } from '@/lib/supabase';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
@@ -48,7 +49,7 @@ const AnnouncementItem = memo(({
           <div className="col-span-1 text-center text-gray-600">
             {total - index}
           </div>
-          <div className="col-span-9 text-gray-900 hover:text-blue-600 hover:underline flex items-center gap-2">
+          <div className="col-span-9 text-black font-medium hover:text-blue-600 hover:underline flex items-center gap-2">
             {announcement.title}
             {announcement.attachments && announcement.attachments.length > 0 && (
               <span className="text-xs text-gray-500">📎 {announcement.attachments.length}</span>
@@ -66,7 +67,7 @@ const AnnouncementItem = memo(({
               {total - index}
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="text-gray-900 font-medium mb-1 hover:text-blue-600 flex items-center gap-2">
+              <h3 className="text-black font-medium mb-1 hover:text-blue-600 flex items-center gap-2">
                 {announcement.title}
                 {announcement.attachments && announcement.attachments.length > 0 && (
                   <span className="text-xs text-gray-500">📎 {announcement.attachments.length}</span>
@@ -88,7 +89,14 @@ AnnouncementItem.displayName = 'AnnouncementItem';
 export default function NoticePage() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
   const isMobile = useMobileDetect();
+  
+  const itemsPerPage = 10;
+  const totalPages = Math.ceil(announcements.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentAnnouncements = announcements.slice(startIndex, endIndex);
 
   useEffect(() => {
     fetchAnnouncements();
@@ -129,16 +137,16 @@ export default function NoticePage() {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 pt-24">
+      <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 pt-28">
         <div className="max-w-6xl mx-auto">
         {/* 헤더 */}
         <motion.div
           initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 30 }}
           animate={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
           transition={{ duration: isMobile ? 0 : 0.5, ease: "easeOut" }}
-          className="mb-8"
+          className="mb-12 text-center"
         >
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">공지사항</h1>
+          <h1 className="text-3xl font-extrabold text-black mb-2">공지사항</h1>
           <p className="text-gray-600">VERADI의 최신 소식을 확인하세요</p>
         </motion.div>
 
@@ -147,17 +155,8 @@ export default function NoticePage() {
           initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 30 }}
           animate={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
           transition={{ duration: isMobile ? 0 : 0.5, delay: isMobile ? 0 : 0.1, ease: "easeOut" }}
-          className="bg-white border border-gray-300"
+          className="bg-white border-t-2 border-gray-800"
         >
-          {/* 테이블 헤더 - 데스크톱 */}
-          <div className="border-b border-gray-300 bg-gray-50 hidden md:block">
-            <div className="grid grid-cols-12 gap-4 px-6 py-4 text-sm font-semibold text-gray-700">
-              <div className="col-span-1 text-center">번호</div>
-              <div className="col-span-9">제목</div>
-              <div className="col-span-2 text-center">작성일</div>
-            </div>
-          </div>
-
           {/* 테이블 내용 */}
           {announcements.length === 0 ? (
             <div className="text-center py-16 text-gray-500">
@@ -165,11 +164,11 @@ export default function NoticePage() {
             </div>
           ) : (
             <div>
-              {announcements.map((announcement, index) => (
+              {currentAnnouncements.map((announcement, index) => (
                 <AnnouncementItem
                   key={announcement.id}
                   announcement={announcement}
-                  index={index}
+                  index={startIndex + index}
                   total={announcements.length}
                   isMobile={isMobile}
                 />
@@ -178,17 +177,57 @@ export default function NoticePage() {
           )}
         </motion.div>
 
-        {/* 페이지네이션 (추후 구현 가능) */}
-        <motion.div
-          initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 20 }}
-          animate={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
-          transition={{ duration: isMobile ? 0 : 0.4, delay: isMobile ? 0 : 0.2, ease: "easeOut" }}
-          className="mt-6 flex justify-center"
-        >
-          <div className="text-sm text-gray-500">
-            총 {announcements.length}개의 공지사항
-          </div>
-        </motion.div>
+        {/* 페이지네이션 */}
+        {totalPages > 1 && (
+          <motion.div
+            initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 20 }}
+            animate={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
+            transition={{ duration: isMobile ? 0 : 0.4, delay: isMobile ? 0 : 0.2, ease: "easeOut" }}
+            className="mt-16 mb-12 flex justify-center items-center gap-2"
+          >
+            {/* 이전 버튼 */}
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              className={`p-1.5 rounded transition-colors ${
+                currentPage === 1
+                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+              }`}
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+
+            {/* 페이지 번호 */}
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                className={`px-3 py-1.5 text-sm rounded transition-colors ${
+                  currentPage === page
+                    ? 'bg-gray-700 text-white'
+                    : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                }`}
+              >
+                {page}
+              </button>
+            ))}
+
+            {/* 다음 버튼 */}
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              disabled={currentPage === totalPages}
+              className={`p-1.5 rounded transition-colors ${
+                currentPage === totalPages
+                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+              }`}
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </motion.div>
+        )}
+
         </div>
       </div>
       <Footer />
