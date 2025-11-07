@@ -17,8 +17,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "VERADI",
-  description: "VERADI HOMEPAGE",
+  title: "VERADI | 1% 로직을 당신의 것으로",
+  description: "고등·수능 zero to mastery. 국내 최상위권 연구진이 만드는 검증된 교육 콘텐츠. GRID 개념&로직, 기출&N제, Subjects 모의고사.",
+  keywords: ["VERADI", "수능", "고등교육", "GRID", "모의고사", "교육콘텐츠", "SKY", "의치한약수"],
+  openGraph: {
+    title: "VERADI | 1% 로직을 당신의 것으로",
+    description: "국내 최상위권 연구진이 만드는 검증된 교육 콘텐츠",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -38,6 +44,12 @@ export default function RootLayout({
         <link 
           rel="preload" 
           href="/images/veradi-logo.png" 
+          as="image"
+          type="image/png"
+        />
+        <link 
+          rel="preload" 
+          href="/images/background.png" 
           as="image"
           type="image/png"
         />

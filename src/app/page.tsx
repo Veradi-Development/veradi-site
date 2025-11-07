@@ -3,9 +3,10 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Subjects from "@/components/Subjects";
-import Team from "@/components/Team";
 import Footer from "@/components/Footer";
 import GridSeries from "@/components/GridSeries";
+import GridSeries2 from "@/components/GridSeries2";
+import VeradiIntro from "@/components/VeradiIntro";
 
 export default function Home() {
   return (
@@ -13,8 +14,9 @@ export default function Home() {
       <Navbar />
       <Hero />
       <GridSeries />
+      <GridSeries2 />
       <Subjects />
-      <Team />
+      <VeradiIntro />
       <Footer />
     </main>
   );

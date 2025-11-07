@@ -1,16 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Users, ShoppingCart } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { useState, useEffect } from "react";
-import { useHorizontalScroll } from "@/hooks/useHorizontalScroll";
 import { useMobileDetect } from "@/hooks/useMobileDetect";
 
-// 상수 정의
-const SCROLL_AMOUNT_RATIO = 0.8;
-const CARD_HOVER_SCALE = 1.03;
 const optimizedStyle = {
   willChange: 'transform' as const,
   backfaceVisibility: 'hidden' as const
@@ -23,15 +17,13 @@ type SubjectBook = {
   description: string | null;
   front_image_url: string | null;
   purchase_link: string | null;
+  price?: string;
 };
 
 export default function Subjects() {
   const [teams, setTeams] = useState<SubjectBook[]>([]);
   const [loading, setLoading] = useState(true);
   const isMobile = useMobileDetect();
-  const { scrollRef, canScrollLeft, canScrollRight, scroll, recheckScroll } = useHorizontalScroll({
-    scrollAmountRatio: SCROLL_AMOUNT_RATIO,
-  });
 
   useEffect(() => {
     // API에서 Subjects 교재 가져오기
@@ -54,22 +46,10 @@ export default function Subjects() {
     fetchSubjectBooks();
   }, []);
 
-  // 데이터 로드 후 스크롤 상태 재체크
-  useEffect(() => {
-    if (teams.length > 0) {
-      const timeouts = [
-        setTimeout(() => recheckScroll(), 100),
-        setTimeout(() => recheckScroll(), 300),
-        setTimeout(() => recheckScroll(), 500),
-      ];
-      return () => timeouts.forEach(t => clearTimeout(t));
-    }
-  }, [teams, recheckScroll]);
-
   return (
     // ✅ 섹션의 overflow-visible로 변경
     <section 
-      className="relative bg-gradient-to-b from-white to-blue-50 py-16 sm:py-24 md:py-32 px-4 sm:px-6 overflow-visible"
+      className="relative bg-gradient-to-b from-white to-blue-50 py-16 sm:py-24 md:py-32 px-2 sm:px-4 overflow-visible"
       style={{
         backgroundImage: `
           radial-gradient(circle at 20% 30%, rgba(0, 0, 0, 0.015) 1px, transparent 1px),
@@ -83,52 +63,19 @@ export default function Subjects() {
         backgroundPosition: '0 0, 1px 1px, 2px 2px, 3px 3px, 4px 4px, 0 0'
       }}
     >
-      <div className="max-w-7xl mx-auto relative overflow-visible">
+      <div className="max-w-[1400px] mx-auto px-2 md:px-4">
         {/* 제목 */}
         <motion.h2
           initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 30 }}
           whileInView={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px", amount: 0.2 }}
           transition={{ duration: isMobile ? 0 : 0.6, ease: "easeOut" }}
-          className="text-3xl sm:text-4xl md:text-5xl text-left font-bold text-gray-900 mb-4 leading-tight tracking-tight"
+          className="text-3xl sm:text-4xl md:text-5xl text-left font-bold text-gray-900 mb-16 leading-tight tracking-tight"
         >
-          VERADI Subjects & Series
+          Subjects & Series
         </motion.h2>
 
-        {/* 🔹 화살표 버튼 */}
-        <div className="pointer-events-none absolute inset-y-0 left-0 right-0 flex justify-between items-center z-20 px-2 sm:px-4 md:px-6">
-          <button
-            onClick={() => scroll("left")}
-            disabled={!canScrollLeft}
-            className={`pointer-events-auto p-2 sm:p-3 rounded-full shadow-md backdrop-blur-sm transition-all duration-300 ${
-              canScrollLeft
-                ? "bg-white/70 hover:bg-white hover:shadow-lg hover:scale-110"
-                : "bg-gray-200/50 cursor-not-allowed opacity-40"
-            }`}
-            aria-label="이전"
-          >
-            <ArrowLeft className={`w-5 h-5 sm:w-6 sm:h-6 transition-colors ${
-              canScrollLeft ? "text-gray-700" : "text-gray-400"
-            }`} />
-          </button>
-
-          <button
-            onClick={() => scroll("right")}
-            disabled={!canScrollRight}
-            className={`pointer-events-auto p-2 sm:p-3 rounded-full shadow-md backdrop-blur-sm transition-all duration-300 ${
-              canScrollRight
-                ? "bg-white/70 hover:bg-white hover:shadow-lg hover:scale-110"
-                : "bg-gray-200/50 cursor-not-allowed opacity-40"
-            }`}
-            aria-label="다음"
-          >
-            <ArrowRight className={`w-5 h-5 sm:w-6 sm:h-6 transition-colors ${
-              canScrollRight ? "text-gray-700" : "text-gray-400"
-            }`} />
-          </button>
-        </div>
-
-        {/* 🔹 수평 스크롤 카드 컨테이너 */}
+        {/* 그리드 컨테이너 */}
         {loading ? (
           <div className="flex justify-center items-center py-20">
             <p className="text-gray-500">로딩 중...</p>
@@ -139,119 +86,89 @@ export default function Subjects() {
           </div>
         ) : (
         <motion.div
-          ref={scrollRef}
           initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 30 }}
           whileInView={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px", amount: 0.2 }}
           transition={{ duration: isMobile ? 0 : 0.5, ease: "easeOut" }}
-          className="flex gap-6 sm:gap-8 md:gap-10 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-8 hide-scrollbar overflow-visible"
-          style={{
-            ...optimizedStyle,
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none'
-          }}
+          className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-16 md:gap-20 lg:gap-24"
         >
             {teams.map((team, idx) => (
               <motion.div
                 key={team.id}
-                initial={isMobile ? { opacity: 1 } : { opacity: 0, x: 30 }}
-                whileInView={isMobile ? { opacity: 1 } : { opacity: 1, x: 0 }}
+                initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 30 }}
+                whileInView={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{ 
                   duration: isMobile ? 0 : 0.4, 
-                  delay: isMobile ? 0 : Math.min(idx * 0.06, 0.3),
+                  delay: isMobile ? 0 : Math.min(idx * 0.08, 0.4),
                   ease: "easeOut" 
                 }}
-                whileHover={isMobile ? {} : { scale: CARD_HOVER_SCALE }}
-                className={`relative flex-shrink-0 w-[320px] sm:w-[360px] md:w-[400px] lg:w-[420px]
-                           bg-white rounded-3xl shadow-lg border border-gray-100
-                           overflow-visible snap-center flex flex-col ${isMobile ? '' : 'hover:shadow-2xl transition-shadow duration-300'}`}
-                style={optimizedStyle}
+                className="relative flex flex-col overflow-visible"
+                style={{paddingTop: '40px', marginTop: '-40px'}}
               >
-                {/* 상단 텍스트 영역 */}
-                <div className="flex-shrink-0 p-6 sm:p-8 pb-4 sm:pb-6">
-                  <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">
-                    {team.subject}{" "}
-                    <span className="text-sky-600">{team.title}</span>
-                  </h3>
-                  <p className="text-gray-600 text-xs sm:text-sm leading-relaxed">
-                    {team.description || ''}
-                  </p>
-                </div>
-
-                {/* 🔹 이미지 영역 (입체적 회전 효과 — 모든 교재 동일) */}
-                <div className="flex-1 min-h-[240px] sm:min-h-[300px] md:min-h-[340px] lg:min-h-[380px] py-4 sm:py-6 flex items-center justify-center relative perspective-[1200px] overflow-visible z-10">
+                {/* 이미지 영역 */}
+                <a
+                  href={team.purchase_link || '#'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block mb-5 perspective-[1200px] overflow-visible group"
+                >
                   {team.front_image_url ? (
                     <motion.div
                       initial={{ rotateY: 0 }}
                       whileHover={isMobile ? {} : { rotateY: 20 }}
                       transition={{ duration: 0.6, ease: "easeInOut" }}
-                      className="relative w-40 h-56 sm:w-52 sm:h-72 md:w-60 md:h-80 lg:w-64 lg:h-[22rem] transform-style-preserve-3d overflow-visible"
+                      className="relative w-full aspect-[3/4] transform-style-preserve-3d"
                       style={{
                         ...optimizedStyle,
                         transformOrigin: "center center"
                       }}
                     >
-                      {/* 앞표지 */}
-                      <div
-                        className="absolute inset-0 bg-white rounded-md overflow-hidden shadow-[0_25px_50px_rgba(0,0,0,0.45)]"
-                        style={{ transform: "translateZ(0px)" }}
-                      >
+                      <div className="relative w-full h-full overflow-hidden rounded-lg shadow-[0_20px_40px_rgba(0,0,0,0.3)] hover:shadow-[0_25px_50px_rgba(0,0,0,0.4)] transition-shadow duration-300">
                         <Image
                           src={team.front_image_url}
-                          alt={`${team.subject} 앞표지`}
+                          alt={`${team.subject} ${team.title}`}
                           fill
-                          sizes="(max-width: 640px) 160px, (max-width: 768px) 208px, (max-width: 1024px) 240px, 256px"
-                          className="object-cover"
+                          sizes="(max-width: 640px) 300px, (max-width: 768px) 350px, 400px"
+                          className="object-cover group-hover:invert transition-all duration-300"
                           quality={75}
                           loading={idx < 2 ? "eager" : "lazy"}
                           placeholder="blur"
                           blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mN8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg=="
                         />
                       </div>
+                      
+                      {/* 구입하기 오버레이 */}
+                      <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none transform group-hover:translate-y-0 translate-y-2">
+                        <span className="bg-white text-black px-4 py-2 rounded-lg text-xs sm:text-sm font-bold shadow-lg border border-gray-200">
+                          구입하기
+                        </span>
+                      </div>
                     </motion.div>
                   ) : (
-                    <div className="bg-gray-100 w-40 h-56 sm:w-52 sm:h-72 md:w-60 md:h-80 lg:w-64 lg:h-[22rem] flex items-center justify-center text-gray-400 text-xs sm:text-sm rounded-md">
-                      {team.subject} 교재 이미지
+                    <div className="w-full aspect-[3/4] bg-gray-100 rounded-lg flex items-center justify-center text-gray-400 text-xs shadow-lg">
+                      이미지 없음
                     </div>
                   )}
-                </div>
+                </a>
 
-                {/* 하단 버튼 */}
-                <div className="flex-shrink-0 flex justify-between items-center gap-3 px-6 sm:px-8 py-4 sm:py-6 border-t border-gray-100 bg-white/70 backdrop-blur-sm rounded-b-3xl">
-                  <Link 
-                    href="/about#veradi-makers"
-                    className="flex items-center gap-1.5 sm:gap-2 px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-semibold text-gray-700 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl hover:from-gray-100 hover:to-gray-200 transition-all duration-200 shadow-sm hover:shadow-md border border-gray-200"
-                  >
-                    <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                    <span>팀 소개</span>
-                  </Link>
-                  <a
-                    href={team.purchase_link || '#'}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 sm:gap-2 px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-sky-500 to-sky-600 rounded-xl hover:from-sky-600 hover:to-sky-700 transition-all duration-200 shadow-md hover:shadow-lg"
-                  >
-                    <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                    <span>구입하기</span>
-                  </a>
+                {/* 텍스트 정보 */}
+                <div className="flex flex-col gap-2">
+                  <h3 className="text-sm sm:text-base md:text-lg font-bold text-gray-900 leading-tight">
+                    {team.title} ({team.subject}) 모의고사
+                  </h3>
+                  <p className="text-xs sm:text-sm text-gray-600 leading-relaxed line-clamp-2">
+                    {team.description || '교재 설명'}
+                  </p>
+                  <p className="text-base sm:text-lg md:text-xl font-bold text-gray-900 mt-1">
+                    {team.price || '가격 문의'}
+                  </p>
                 </div>
               </motion.div>
             ))}
           </motion.div>
         )}
       </div>
-
-      {/* 스크롤바 숨김 */}
-      <style jsx>{`
-        .hide-scrollbar::-webkit-scrollbar {
-          display: none;
-        }
-        .hide-scrollbar {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-      `}</style>
     </section>
   );
 }

@@ -22,3 +22,4 @@ export const fadeInUp = {
   animate: { opacity: 1, y: 0 }
 };
 
+

@@ -37,11 +37,11 @@ const BookCard = memo(({ subject, idx, isMobile }: { subject: GridBook, idx: num
       ease: "easeOut" 
     }}
     whileHover={isMobile ? {} : { scale: CARD_HOVER_SCALE }}
-    className={`relative flex-shrink-0 w-[310px] sm:w-[410px] md:w-[510px] lg:w-[580px] xl:w-[630px] h-[280px] sm:h-[320px] md:h-[360px] lg:h-[440px] xl:h-[480px] bg-white rounded-3xl shadow-lg border border-gray-100 snap-center overflow-visible ${isMobile ? '' : 'hover:shadow-2xl transition-shadow duration-300'}`}
+    className={`relative flex-shrink-0 w-[280px] sm:w-[340px] md:w-[400px] lg:w-[460px] h-[240px] sm:h-[280px] md:h-[320px] lg:h-[360px] bg-white rounded-2xl shadow-lg border border-gray-100 snap-center overflow-visible ${isMobile ? '' : 'hover:shadow-2xl transition-shadow duration-300'}`}
     style={optimizedStyle}
   >
-    <div className="pt-4 sm:pt-5 md:pt-6 lg:pt-7 pb-0 text-center">
-      <h3 className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-900 mb-1">
+    <div className="pt-3 sm:pt-4 md:pt-5 pb-0 text-center">
+      <h3 className="text-base sm:text-lg md:text-xl font-semibold text-gray-900 mb-1">
         {subject.subject}
       </h3>
     </div>
@@ -50,17 +50,17 @@ const BookCard = memo(({ subject, idx, isMobile }: { subject: GridBook, idx: num
       href={subject.purchase_link || '#'}
       target="_blank"
       rel="noopener noreferrer"
-      className={`group/books h-[75%] mt-2 sm:mt-3 md:mt-4 flex items-center justify-center gap-3 sm:gap-4 md:gap-5 relative overflow-visible cursor-pointer ${isMobile ? 'pointer-events-auto' : ''}`}
+      className={`group/books h-[75%] mt-2 flex items-center justify-center gap-2 sm:gap-3 relative overflow-visible cursor-pointer ${isMobile ? 'pointer-events-auto' : ''}`}
     >
       {subject.main_image_url && (
-        <div className={`relative w-[130px] sm:w-[160px] md:w-[190px] lg:w-[220px] xl:w-[240px] h-[180px] sm:h-[220px] md:h-[260px] lg:h-[320px] xl:h-[350px] overflow-hidden shadow-[0_25px_50px_rgba(0,0,0,0.35)] bg-white border border-gray-200 ${isMobile ? '' : 'group-hover/books:shadow-[0_30px_60px_rgba(0,0,0,0.4)] transition-shadow duration-300'}`}
+        <div className={`relative w-[110px] sm:w-[135px] md:w-[160px] lg:w-[185px] h-[155px] sm:h-[185px] md:h-[215px] lg:h-[245px] overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.35)] bg-white border border-gray-200 ${isMobile ? '' : 'group-hover/books:shadow-[0_25px_50px_rgba(0,0,0,0.4)] transition-shadow duration-300'}`}
           style={optimizedStyle}
         >
           <Image
             src={subject.main_image_url}
             alt={`${subject.subject} 문제집`}
             fill
-            sizes="(max-width: 640px) 130px, (max-width: 768px) 160px, (max-width: 1024px) 190px, (max-width: 1280px) 220px, 240px"
+            sizes="(max-width: 640px) 110px, (max-width: 768px) 135px, (max-width: 1024px) 160px, 185px"
             className="object-cover"
             quality={75}
             loading={idx < 2 ? "eager" : "lazy"}
@@ -71,18 +71,18 @@ const BookCard = memo(({ subject, idx, isMobile }: { subject: GridBook, idx: num
       )}
 
       {subject.main_image_url && subject.sub_image_url && (
-        <div className="w-[1px] h-[180px] sm:h-[220px] md:h-[260px] lg:h-[320px] xl:h-[350px] bg-gray-200" />
+        <div className="w-[1px] h-[155px] sm:h-[185px] md:h-[215px] lg:h-[245px] bg-gray-200" />
       )}
 
       {subject.sub_image_url && (
-        <div className={`relative w-[130px] sm:w-[160px] md:w-[190px] lg:w-[220px] xl:w-[240px] h-[180px] sm:h-[220px] md:h-[260px] lg:h-[320px] xl:h-[350px] overflow-hidden shadow-[0_25px_50px_rgba(0,0,0,0.3)] bg-white border border-gray-200 ${isMobile ? '' : 'group-hover/books:shadow-[0_30px_60px_rgba(0,0,0,0.35)] transition-shadow duration-300'}`}
+        <div className={`relative w-[110px] sm:w-[135px] md:w-[160px] lg:w-[185px] h-[155px] sm:h-[185px] md:h-[215px] lg:h-[245px] overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.3)] bg-white border border-gray-200 ${isMobile ? '' : 'group-hover/books:shadow-[0_25px_50px_rgba(0,0,0,0.35)] transition-shadow duration-300'}`}
           style={optimizedStyle}
         >
           <Image
             src={subject.sub_image_url}
             alt={`${subject.subject} 해설집`}
             fill
-            sizes="(max-width: 640px) 130px, (max-width: 768px) 160px, (max-width: 1024px) 190px, (max-width: 1280px) 220px, 240px"
+            sizes="(max-width: 640px) 110px, (max-width: 768px) 135px, (max-width: 1024px) 160px, 185px"
             className="object-cover"
             quality={75}
             loading={idx < 2 ? "eager" : "lazy"}
@@ -147,7 +147,7 @@ export default function GridSeries() {
 
   return (
     <section
-      className="relative py-32 px-6 overflow-hidden"
+      className="relative pt-32 pb-16 px-2 sm:px-4 overflow-hidden"
       style={{
         backgroundImage:
           "linear-gradient(90deg, rgba(0,0,0,0.07) 1px, transparent 1px), linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px)",
@@ -156,98 +156,100 @@ export default function GridSeries() {
         backgroundColor: "#f8fafc",
       }}
     >
-      <div className="max-w-[1400px] mx-auto relative px-4 md:px-8">
-        {/* 상단 문구 */}
-        <motion.div
-          initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 30 }}
-          whileInView={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px", amount: 0.2 }}
-          transition={{ duration: isMobile ? 0 : 0.6, ease: "easeOut" }}
-          className="text-left mb-24"
-        >
-          <h2 className="text-5xl font-bold text-gray-900 tracking-tight mb-4 leading-[1.1]">
-            GRID
-          </h2>
-          <p className="text-lg md:text-3xl text-gray-700 font-medium tracking-tight">
-            :1%의 로직 - 실전 문제 풀이의 절대 기준선
-          </p>
-        </motion.div>
+      <div className="max-w-[1400px] mx-auto px-2 md:px-4">
+        {/* 좌우 레이아웃 */}
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-center lg:items-start">
+          {/* 왼쪽: 텍스트 및 버튼 영역 */}
+          <div className="w-full lg:w-[30%] flex-shrink-0 lg:pl-0">
+            <motion.div
+              initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 30 }}
+              whileInView={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px", amount: 0.2 }}
+              transition={{ duration: isMobile ? 0 : 0.6, ease: "easeOut" }}
+              className="text-left"
+            >
+              <h2 className="text-5xl md:text-6xl font-bold text-gray-900 tracking-tight mb-6 leading-[1.1]">
+                GRID
+              </h2>
+              <p className="text-xl md:text-2xl text-gray-500 font-medium tracking-tight mb-8">
+                개념&로직 [물1/화1/생1/지1]
+              </p>
 
-        {/* 화살표 버튼 */}
-        <div className="pointer-events-none absolute inset-y-0 left-0 right-0 flex justify-between items-center z-20 px-6">
-          <button
-            onClick={() => scroll("left")}
-            disabled={!canScrollLeft}
-            className={`pointer-events-auto p-3 rounded-full shadow-md backdrop-blur-sm transition-all duration-300 ${
-              canScrollLeft
-                ? "bg-white/80 hover:bg-white hover:shadow-xl hover:scale-110 cursor-pointer"
-                : "bg-white/30 opacity-40 cursor-not-allowed"
-            }`}
-            aria-label="이전 슬라이드"
-          >
-            <ArrowLeft className={`w-6 h-6 transition-colors ${canScrollLeft ? "text-gray-700" : "text-gray-400"}`} />
-          </button>
+              {/* 버튼 영역 */}
+              <div className="flex flex-col sm:flex-row gap-4">
+                <button className="group flex items-center justify-center gap-2 px-6 py-3 text-base font-semibold text-white bg-black hover:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200">
+                  <ShoppingCart className="w-5 h-5" />
+                  구입하기
+                </button>
+                <button className="group flex items-center justify-center gap-2 px-6 py-3 text-base font-semibold text-gray-700 bg-white border-2 border-gray-300 rounded-xl shadow-md hover:shadow-lg hover:border-gray-400 hover:text-gray-900 transition-all duration-200">
+                  <BookOpen className="w-5 h-5" />
+                  더 알아보기
+                </button>
+              </div>
+            </motion.div>
+          </div>
 
-          <button
-            onClick={() => scroll("right")}
-            disabled={!canScrollRight}
-            className={`pointer-events-auto p-3 rounded-full shadow-md backdrop-blur-sm transition-all duration-300 ${
-              canScrollRight
-                ? "bg-white/80 hover:bg-white hover:shadow-xl hover:scale-110 cursor-pointer"
-                : "bg-white/30 opacity-40 cursor-not-allowed"
-            }`}
-            aria-label="다음 슬라이드"
-          >
-            <ArrowRight className={`w-6 h-6 transition-colors ${canScrollRight ? "text-gray-700" : "text-gray-400"}`} />
-          </button>
+          {/* 오른쪽: 슬라이드 영역 */}
+          <div className="w-full lg:w-[70%] relative">
+            {/* 화살표 버튼 */}
+            <div className="pointer-events-none absolute inset-y-0 left-0 right-0 flex justify-between items-center z-20 px-2">
+              <button
+                onClick={() => scroll("left")}
+                disabled={!canScrollLeft}
+                className={`pointer-events-auto p-2 sm:p-3 rounded-full shadow-md backdrop-blur-sm transition-all duration-300 ${
+                  canScrollLeft
+                    ? "bg-white/80 hover:bg-white hover:shadow-xl hover:scale-110 cursor-pointer"
+                    : "bg-white/30 opacity-40 cursor-not-allowed"
+                }`}
+                aria-label="이전 슬라이드"
+              >
+                <ArrowLeft className={`w-5 h-5 sm:w-6 sm:h-6 transition-colors ${canScrollLeft ? "text-gray-700" : "text-gray-400"}`} />
+              </button>
+
+              <button
+                onClick={() => scroll("right")}
+                disabled={!canScrollRight}
+                className={`pointer-events-auto p-2 sm:p-3 rounded-full shadow-md backdrop-blur-sm transition-all duration-300 ${
+                  canScrollRight
+                    ? "bg-white/80 hover:bg-white hover:shadow-xl hover:scale-110 cursor-pointer"
+                    : "bg-white/30 opacity-40 cursor-not-allowed"
+                }`}
+                aria-label="다음 슬라이드"
+              >
+                <ArrowRight className={`w-5 h-5 sm:w-6 sm:h-6 transition-colors ${canScrollRight ? "text-gray-700" : "text-gray-400"}`} />
+              </button>
+            </div>
+
+            {/* 카드 컨테이너 */}
+            {loading ? (
+              <div className="flex justify-center items-center py-20">
+                <p className="text-gray-500">로딩 중...</p>
+              </div>
+            ) : subjects.length === 0 ? (
+              <div className="flex justify-center items-center py-20">
+                <p className="text-gray-500">등록된 교재가 없습니다</p>
+              </div>
+            ) : (
+              <motion.div
+                ref={scrollRef}
+                initial={isMobile ? { opacity: 1 } : { opacity: 0, x: 30 }}
+                whileInView={isMobile ? { opacity: 1 } : { opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: "-50px", amount: 0.2 }}
+                transition={{ duration: isMobile ? 0 : 0.5, ease: "easeOut" }}
+                className="flex gap-6 md:gap-8 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-8 hide-scrollbar"
+                style={{
+                  ...optimizedStyle,
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none'
+                }}
+              >
+                {subjects.map((subject, idx) => (
+                  <BookCard key={subject.id} subject={subject} idx={idx} isMobile={isMobile} />
+                ))}
+              </motion.div>
+            )}
+          </div>
         </div>
-
-        {/* 카드 컨테이너 */}
-        {loading ? (
-          <div className="flex justify-center items-center py-20">
-            <p className="text-gray-500">로딩 중...</p>
-          </div>
-        ) : subjects.length === 0 ? (
-          <div className="flex justify-center items-center py-20">
-            <p className="text-gray-500">등록된 교재가 없습니다</p>
-          </div>
-        ) : (
-          <motion.div
-            ref={scrollRef}
-            initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 30 }}
-            whileInView={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px", amount: 0.2 }}
-            transition={{ duration: isMobile ? 0 : 0.5, ease: "easeOut" }}
-            className="flex gap-6 md:gap-8 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-8 hide-scrollbar"
-            style={{
-              ...optimizedStyle,
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none'
-            }}
-          >
-            {subjects.map((subject, idx) => (
-              <BookCard key={subject.id} subject={subject} idx={idx} isMobile={isMobile} />
-            ))}
-          </motion.div>
-        )}
-
-        {/* 섹션 하단 버튼 */}
-        <motion.div
-          initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 20 }}
-          whileInView={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-50px", amount: 0.2 }}
-          transition={{ duration: isMobile ? 0 : 0.4, ease: "easeOut" }}
-          className="mt-20 flex flex-wrap justify-center gap-3 sm:gap-4 md:gap-6"
-        >
-          <button className="group flex items-center gap-1.5 sm:gap-2 px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg font-semibold text-gray-700 bg-white border-2 border-gray-300 rounded-xl shadow-md hover:shadow-lg hover:border-gray-400 hover:text-gray-900 transition-all duration-200">
-            <BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />
-            더 알아보기
-          </button>
-          <button className="group flex items-center gap-1.5 sm:gap-2 px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg font-semibold text-white bg-gradient-to-r from-sky-600 to-blue-600 rounded-xl shadow-lg hover:shadow-xl hover:from-sky-700 hover:to-blue-700 transition-all duration-200">
-            <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
-            구입하기
-          </button>
-        </motion.div>
       </div>
 
       {/* 스크롤바 숨김 */}

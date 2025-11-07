@@ -53,6 +53,7 @@ export async function POST(request: NextRequest) {
       sub_image_url, 
       front_image_url, 
       purchase_link, 
+      price,
       display_order,
       password 
     } = await request.json();
@@ -91,6 +92,7 @@ export async function POST(request: NextRequest) {
         sub_image_url,
         front_image_url,
         purchase_link,
+        price,
         display_order: display_order || 0,
       }])
       .select()

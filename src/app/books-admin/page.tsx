@@ -12,6 +12,7 @@ type Book = {
   sub_image_url: string | null;
   front_image_url: string | null;
   purchase_link: string | null;
+  price: string | null;
   display_order: number;
   created_at: string;
   updated_at: string;
@@ -38,6 +39,7 @@ export default function AdminBooksPage() {
     sub_image_url: '',
     front_image_url: '',
     purchase_link: '',
+    price: '',
     display_order: 0,
   });
   const [uploading, setUploading] = useState(false);
@@ -113,6 +115,7 @@ export default function AdminBooksPage() {
           sub_image_url: '',
           front_image_url: '',
           purchase_link: '',
+          price: '',
           display_order: 0,
         });
         fetchBooks();
@@ -136,6 +139,7 @@ export default function AdminBooksPage() {
       sub_image_url: book.sub_image_url || '',
       front_image_url: book.front_image_url || '',
       purchase_link: book.purchase_link || '',
+      price: book.price || '',
       display_order: book.display_order,
     });
     setEditingId(book.id);
@@ -313,6 +317,7 @@ export default function AdminBooksPage() {
               sub_image_url: '',
               front_image_url: '',
               purchase_link: '',
+              price: '',
               display_order: 0,
             });
           }}
@@ -512,6 +517,22 @@ export default function AdminBooksPage() {
                 placeholder="https://..."
               />
             </div>
+
+            {/* 가격 (Subjects용만) */}
+            {formData.type === 'subject' && (
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  가격
+                </label>
+                <input
+                  type="text"
+                  value={formData.price}
+                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  placeholder="예: ₩21,000"
+                />
+              </div>
+            )}
 
             <div className="mt-6 flex gap-3">
               <button

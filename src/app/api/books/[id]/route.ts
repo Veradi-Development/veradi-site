@@ -54,6 +54,7 @@ export async function PUT(
       sub_image_url, 
       front_image_url, 
       purchase_link, 
+      price,
       display_order,
       password 
     } = await request.json();
@@ -76,6 +77,7 @@ export async function PUT(
         sub_image_url,
         front_image_url,
         purchase_link,
+        price,
         display_order,
       })
       .eq('id', id)

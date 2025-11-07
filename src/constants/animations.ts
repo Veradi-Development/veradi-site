@@ -37,3 +37,19 @@ export const VIEWPORT_CONFIG_TITLE = {
   margin: "-100px",
 } as const;
 
+// GPU 가속 최적화 스타일
+export const optimizedStyle = {
+  willChange: 'transform' as const,
+  backfaceVisibility: 'hidden' as const,
+  transform: 'translateZ(0)'
+};
+
+// 모바일 감지 조건부 애니메이션 헬퍼
+export const getConditionalAnimation = <T,>(
+  isMobile: boolean, 
+  mobileValue: T, 
+  desktopValue: T
+): T => {
+  return isMobile ? mobileValue : desktopValue;
+};
+
