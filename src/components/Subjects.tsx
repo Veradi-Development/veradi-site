@@ -47,20 +47,10 @@ export default function Subjects() {
   }, []);
 
   return (
-    // ✅ 섹션의 overflow-visible로 변경
     <section 
-      className="relative bg-gradient-to-b from-white to-blue-50 py-16 sm:py-24 md:py-32 px-2 sm:px-4 overflow-visible"
+      className="relative py-16 sm:py-24 md:py-32 px-2 sm:px-4 overflow-visible"
       style={{
-        backgroundImage: `
-          radial-gradient(circle at 20% 30%, rgba(0, 0, 0, 0.015) 1px, transparent 1px),
-          radial-gradient(circle at 60% 70%, rgba(0, 0, 0, 0.012) 1px, transparent 1px),
-          radial-gradient(circle at 40% 50%, rgba(0, 0, 0, 0.01) 1px, transparent 1px),
-          radial-gradient(circle at 80% 10%, rgba(0, 0, 0, 0.013) 1px, transparent 1px),
-          radial-gradient(circle at 15% 80%, rgba(0, 0, 0, 0.011) 1px, transparent 1px),
-          linear-gradient(to bottom, white, rgb(239, 246, 255))
-        `,
-        backgroundSize: '3px 3px, 5px 5px, 4px 4px, 6px 6px, 5px 5px, 100% 100%',
-        backgroundPosition: '0 0, 1px 1px, 2px 2px, 3px 3px, 4px 4px, 0 0'
+        background: 'linear-gradient(to bottom, #f5f1eb 0%, #ede8e1 50%, #e8e3dc 100%)',
       }}
     >
       <div className="max-w-[1400px] mx-auto px-2 md:px-4">
@@ -124,7 +114,7 @@ export default function Subjects() {
                         transformOrigin: "center center"
                       }}
                     >
-                      <div className="relative w-full h-full overflow-hidden rounded-lg shadow-[0_20px_40px_rgba(0,0,0,0.3)] hover:shadow-[0_25px_50px_rgba(0,0,0,0.4)] transition-shadow duration-300">
+                      <div className="relative w-full h-full overflow-hidden rounded-lg shadow-[0_25px_50px_rgba(0,0,0,0.5)] hover:shadow-[0_30px_60px_rgba(0,0,0,0.6)] transition-shadow duration-300">
                         <Image
                           src={team.front_image_url}
                           alt={`${team.subject} ${team.title}`}

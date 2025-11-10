@@ -7,7 +7,7 @@ import { useState, useEffect, useCallback, memo } from "react";
 
 const Navbar = memo(function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isAtTop, setIsAtTop] = useState(true);
+  const [navState, setNavState] = useState<'dark' | 'light-transparent' | 'solid'>('dark');
   const pathname = usePathname();
 
   const menuItems = [
@@ -20,9 +20,16 @@ const Navbar = memo(function Navbar() {
   const handleScroll = useCallback(() => {
     const scrollY = window.scrollY;
     const heroHeight = window.innerHeight;
-    // GridSeries와 GridSeries2 섹션 모두 포함하여 어두운 배경 범위 확장
-    const darkSectionHeight = heroHeight + 1600;
-    setIsAtTop(scrollY < darkSectionHeight);
+    const darkSectionEnd = heroHeight + 1500; // GridSeries2 끝
+    const subjectsEnd = darkSectionEnd + 1000; // Subjects 섹션
+    
+    if (scrollY < darkSectionEnd) {
+      setNavState('dark'); // 어두운 섹션: 투명 + 흰색
+    } else if (scrollY < subjectsEnd) {
+      setNavState('light-transparent'); // Subjects: 투명 + 검정
+    } else {
+      setNavState('solid'); // 나머지: 흰색 배경 + 검정
+    }
   }, []);
 
   useEffect(() => {
@@ -33,15 +40,17 @@ const Navbar = memo(function Navbar() {
 
   const isHomePage = pathname === '/';
 
+  const isDark = isHomePage && navState === 'dark';
+  const isLightTransparent = isHomePage && navState === 'light-transparent';
+  const showDarkText = !isDark; // 어두운 섹션이 아니면 검정 텍스트
+
   return (
-    <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-      isHomePage && isAtTop ? 'bg-transparent' : 'bg-white shadow-sm'
-    }`}>
+    <nav className="fixed top-0 w-full z-50 transition-all duration-300 bg-transparent">
       <div className="flex items-center px-4 sm:px-6 md:px-8 py-4">
         {/* 로고 */}
         <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
           <span className={`text-xl sm:text-2xl font-bold tracking-tight transition-colors duration-300 ${
-            isHomePage && isAtTop ? 'text-white drop-shadow-lg' : 'text-gray-900'
+            showDarkText ? 'text-gray-900' : 'text-white drop-shadow-lg'
           }`}>
             VERADI
           </span>
@@ -59,15 +68,15 @@ const Navbar = memo(function Navbar() {
                 key={item.href} 
                 href={item.href}
                 className={`transition-colors font-medium relative text-base ${
-                  isHomePage && isAtTop
-                    ? `drop-shadow-lg ${isActive ? "text-white" : "text-white/90 hover:text-white"}`
-                    : `${isActive ? "text-blue-600" : "text-gray-700 hover:text-blue-600"}`
+                  showDarkText
+                    ? `${isActive ? "text-blue-600" : "text-gray-700 hover:text-blue-600"}`
+                    : `drop-shadow-lg ${isActive ? "text-white" : "text-white/90 hover:text-white"}`
                 }`}
               >
                 {item.label}
                 {isActive && (
                   <span className={`absolute -bottom-1 left-0 w-full h-0.5 rounded-full transition-colors duration-300 ${
-                    isHomePage && isAtTop ? 'bg-white' : 'bg-blue-600'
+                    showDarkText ? 'bg-blue-600' : 'bg-white'
                   }`}></span>
                 )}
               </Link>
@@ -83,11 +92,11 @@ const Navbar = memo(function Navbar() {
             target="_blank" 
             rel="noopener noreferrer"
             className={`p-2 rounded-full transition-colors ${
-              isHomePage && isAtTop ? 'hover:bg-white/10' : 'hover:bg-gray-100'
+              showDarkText ? 'hover:bg-gray-100' : 'hover:bg-white/10'
             }`}
           >
             <Instagram className={`w-5 h-5 sm:w-6 sm:h-6 text-pink-500 hover:text-pink-400 transition-colors ${
-              isHomePage && isAtTop ? 'drop-shadow-lg' : ''
+              showDarkText ? '' : 'drop-shadow-lg'
             }`} />
           </Link>
 
@@ -95,17 +104,17 @@ const Navbar = memo(function Navbar() {
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className={`md:hidden p-2 rounded-full transition-colors ${
-              isHomePage && isAtTop ? 'hover:bg-white/10' : 'hover:bg-gray-100'
+              showDarkText ? 'hover:bg-gray-100' : 'hover:bg-white/10'
             }`}
             aria-label="메뉴"
           >
             {isMenuOpen ? (
               <X className={`w-6 h-6 transition-colors ${
-                isHomePage && isAtTop ? 'text-white drop-shadow-lg' : 'text-gray-900'
+                showDarkText ? 'text-gray-900' : 'text-white drop-shadow-lg'
               }`} />
             ) : (
               <Menu className={`w-6 h-6 transition-colors ${
-                isHomePage && isAtTop ? 'text-white drop-shadow-lg' : 'text-gray-900'
+                showDarkText ? 'text-gray-900' : 'text-white drop-shadow-lg'
               }`} />
             )}
           </button>
