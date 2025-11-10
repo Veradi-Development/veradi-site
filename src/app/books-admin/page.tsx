@@ -7,7 +7,7 @@ type Book = {
   title: string;
   subject: string;
   description: string | null;
-  type: 'grid' | 'subject';
+  type: 'grid' | 'grid2' | 'subject';
   main_image_url: string | null;
   sub_image_url: string | null;
   front_image_url: string | null;
@@ -25,7 +25,7 @@ export default function AdminBooksPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   
-  const [activeTab, setActiveTab] = useState<'grid' | 'subject'>('grid');
+  const [activeTab, setActiveTab] = useState<'grid' | 'grid2' | 'subject'>('grid');
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -34,7 +34,7 @@ export default function AdminBooksPage() {
     subject: '',
     title: '',
     description: '',
-    type: 'grid' as 'grid' | 'subject',
+    type: 'grid' as 'grid' | 'grid2' | 'subject',
     main_image_url: '',
     sub_image_url: '',
     front_image_url: '',
@@ -97,7 +97,7 @@ export default function AdminBooksPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           ...formData, 
-          title: formData.type === 'grid' ? formData.subject : formData.title, // GRID는 과목명, Subjects는 팀 이름
+          title: (formData.type === 'grid' || formData.type === 'grid2') ? formData.subject : formData.title, // GRID는 과목명, Subjects는 팀 이름
           password: ADMIN_PASSWORD 
         }),
       });
@@ -285,7 +285,20 @@ export default function AdminBooksPage() {
                   : 'text-gray-600 border-transparent hover:text-gray-900'
               }`}
             >
-              GRID 교재
+              GRID 개념&로직
+            </button>
+            <button
+              onClick={() => {
+                setActiveTab('grid2');
+                setShowForm(false);
+              }}
+              className={`px-6 py-3 font-semibold transition-colors border-b-2 ${
+                activeTab === 'grid2'
+                  ? 'text-blue-600 border-blue-600'
+                  : 'text-gray-600 border-transparent hover:text-gray-900'
+              }`}
+            >
+              GRID 기출&N제
             </button>
             <button
               onClick={() => {
@@ -323,14 +336,14 @@ export default function AdminBooksPage() {
           }}
           className="mb-6 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
-          {showForm ? '취소' : `새 ${activeTab === 'grid' ? 'GRID' : 'Subjects'} 교재 추가`}
+          {showForm ? '취소' : `새 ${activeTab === 'grid' ? 'GRID 개념&로직' : activeTab === 'grid2' ? 'GRID 기출&N제' : 'Subjects'} 교재 추가`}
         </button>
 
         {/* 교재 추가/수정 폼 */}
         {showForm && (
           <form onSubmit={handleSubmit} className="mb-8 bg-white p-6 rounded-lg border border-gray-300">
             <h2 className="text-xl font-bold mb-4">
-              {editingId ? `${formData.type === 'grid' ? 'GRID' : 'Subjects'} 교재 수정` : `새 ${formData.type === 'grid' ? 'GRID' : 'Subjects'} 교재 추가`}
+              {editingId ? `${formData.type === 'grid' ? 'GRID 개념&로직' : formData.type === 'grid2' ? 'GRID 기출&N제' : 'Subjects'} 교재 수정` : `새 ${formData.type === 'grid' ? 'GRID 개념&로직' : formData.type === 'grid2' ? 'GRID 기출&N제' : 'Subjects'} 교재 추가`}
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -411,7 +424,7 @@ export default function AdminBooksPage() {
             )}
 
             {/* 이미지 업로드/URL */}
-            {formData.type === 'grid' ? (
+            {(formData.type === 'grid' || formData.type === 'grid2') ? (
               <>
                 {/* 문제집 이미지 */}
                 <div className="mt-4">
@@ -571,7 +584,7 @@ export default function AdminBooksPage() {
                 {filteredBooks.length === 0 ? (
                   <tr>
                     <td colSpan={4} className="px-4 py-8 text-center text-gray-500">
-                      등록된 {activeTab === 'grid' ? 'GRID' : 'Subjects'} 교재가 없습니다.
+                      등록된 {activeTab === 'grid' ? 'GRID 개념&로직' : activeTab === 'grid2' ? 'GRID 기출&N제' : 'Subjects'} 교재가 없습니다.
                     </td>
                   </tr>
                 ) : (

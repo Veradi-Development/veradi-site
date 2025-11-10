@@ -20,7 +20,9 @@ const Navbar = memo(function Navbar() {
   const handleScroll = useCallback(() => {
     const scrollY = window.scrollY;
     const heroHeight = window.innerHeight;
-    setIsAtTop(scrollY < heroHeight - 100);
+    // GridSeries와 GridSeries2 섹션 모두 포함하여 어두운 배경 범위 확장
+    const darkSectionHeight = heroHeight + 1600;
+    setIsAtTop(scrollY < darkSectionHeight);
   }, []);
 
   useEffect(() => {
