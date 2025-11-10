@@ -23,7 +23,7 @@ type GridBook = {
   purchase_link: string | null;
 };
 
-const BookCard = memo(({ subject, idx, isMobile }: { subject: GridBook, idx: number, isMobile: boolean }) => {
+const BookCard = memo(({ subject, idx, isMobile, onImageLoad }: { subject: GridBook, idx: number, isMobile: boolean, onImageLoad?: () => void }) => {
   const cardBgs = [
     'linear-gradient(135deg, rgb(29, 78, 216) 0%, rgb(30, 64, 175) 50%, rgb(37, 99, 235) 100%)',
     'linear-gradient(135deg, rgb(154, 52, 18) 0%, rgb(194, 65, 12) 50%, rgb(234, 88, 12) 100%)',
@@ -111,6 +111,7 @@ const BookCard = memo(({ subject, idx, isMobile }: { subject: GridBook, idx: num
               loading={idx < 2 ? "eager" : "lazy"}
               placeholder="blur"
               blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mN8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg=="
+              onLoad={onImageLoad}
             />
           </div>
         )}
@@ -138,6 +139,7 @@ const BookCard = memo(({ subject, idx, isMobile }: { subject: GridBook, idx: num
               loading={idx < 2 ? "eager" : "lazy"}
               placeholder="blur"
               blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mN8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg=="
+              onLoad={onImageLoad}
             />
           </div>
         )}
@@ -273,7 +275,13 @@ export default function GridSeries2() {
                 }}
               >
                 {subjects.map((subject, idx) => (
-                  <BookCard key={subject.id} subject={subject} idx={idx} isMobile={isMobile} />
+                  <BookCard 
+                    key={subject.id} 
+                    subject={subject} 
+                    idx={idx} 
+                    isMobile={isMobile}
+                    onImageLoad={recheckScroll}
+                  />
                 ))}
               </motion.div>
             )}
