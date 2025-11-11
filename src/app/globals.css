@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+/* 가로 스크롤 방지 */
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
 /* Quill 에디터 및 Prose 공통 스타일 */
 .ql-editor img,
 .prose img {

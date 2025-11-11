@@ -36,11 +36,9 @@ const BookCard = memo(({ subject, idx, isMobile, onImageLoad }: { subject: GridB
   return (
     <div
       key={subject.id}
-      className={`relative flex-shrink-0 snap-start overflow-visible rounded-3xl`}
+      className={`relative flex-shrink-0 snap-start overflow-visible rounded-3xl w-[300px] sm:w-[400px] md:w-[480px] h-[350px] sm:h-[380px] md:h-[420px]`}
       style={{
         ...optimizedStyle,
-        width: '480px',
-        height: '420px',
         scrollSnapAlign: 'start',
       }}
     >
@@ -79,24 +77,22 @@ const BookCard = memo(({ subject, idx, isMobile, onImageLoad }: { subject: GridB
       className={`group relative w-full h-full flex flex-col items-center justify-center p-6 cursor-pointer ${isMobile ? 'pointer-events-auto' : ''}`}
     >
       {/* 과목명 - 가운데 */}
-      <h3 className="absolute top-4 left-1/2 -translate-x-1/2 text-2xl font-bold text-black z-30" style={{ textShadow: '0 1px 3px rgba(255,255,255,0.2)' }}>
+      <h3 className="absolute top-3 sm:top-4 left-1/2 -translate-x-1/2 text-lg sm:text-xl md:text-2xl font-bold text-black z-30" style={{ textShadow: '0 1px 3px rgba(255,255,255,0.2)' }}>
         {subject.subject}
       </h3>
 
       {/* 책 이미지 컨테이너 - 겹치게 배치, 함께 움직임 */}
       <motion.div 
         className="relative flex items-center justify-center h-full" 
-        style={{ marginTop: '40px' }}
+        style={{ marginTop: '30px' }}
         whileHover={isMobile ? {} : { y: -10 }}
         transition={{ duration: 0.3 }}
       >
         {subject.sub_image_url && (
           <div 
-            className={`relative overflow-hidden bg-white border-2 border-gray-200 ${isMobile ? '' : 'group-hover:border-blue-400 transition-all duration-300'}`}
+            className={`relative overflow-hidden bg-white border-2 border-gray-200 ${isMobile ? '' : 'group-hover:border-blue-400 transition-all duration-300'} w-[165px] h-[230px] sm:w-[160px] sm:h-[220px] md:w-[200px] md:h-[280px]`}
             style={{
               ...optimizedStyle,
-              width: '200px',
-              height: '280px',
               boxShadow: '0 30px 70px rgba(0,0,0,0.7), 0 20px 40px rgba(0,0,0,0.6), 0 10px 20px rgba(0,0,0,0.5)',
               zIndex: 1,
             }}
@@ -105,7 +101,7 @@ const BookCard = memo(({ subject, idx, isMobile, onImageLoad }: { subject: GridB
               src={subject.sub_image_url}
               alt={`${subject.subject} 해설집`}
               fill
-              sizes="200px"
+              sizes="(max-width: 640px) 165px, (max-width: 768px) 160px, 200px"
               className="object-cover"
               quality={75}
               loading={idx < 2 ? "eager" : "lazy"}
@@ -118,22 +114,18 @@ const BookCard = memo(({ subject, idx, isMobile, onImageLoad }: { subject: GridB
 
         {subject.main_image_url && (
           <div 
-            className={`relative overflow-hidden bg-white border-2 border-gray-200 ${isMobile ? '' : 'group-hover:border-blue-400 transition-all duration-300'}`}
+            className={`relative overflow-hidden bg-white border-2 border-gray-200 ${isMobile ? '' : 'group-hover:border-blue-400 transition-all duration-300'} w-[165px] h-[230px] sm:w-[160px] sm:h-[220px] md:w-[200px] md:h-[280px] -ml-[85px] sm:-ml-[60px] md:-ml-[80px] -mt-[45px] sm:-mt-[35px] md:-mt-[50px]`}
             style={{
               ...optimizedStyle,
-              width: '200px',
-              height: '280px',
               boxShadow: '0 40px 90px rgba(0,0,0,0.8), 0 30px 60px rgba(0,0,0,0.7), 0 20px 40px rgba(0,0,0,0.6)',
               zIndex: 2,
-              marginLeft: '-80px',
-              marginTop: '-50px'
             }}
           >
             <Image
               src={subject.main_image_url}
               alt={`${subject.subject} 문제집`}
               fill
-              sizes="200px"
+              sizes="(max-width: 640px) 165px, (max-width: 768px) 160px, 200px"
               className="object-cover"
               quality={75}
               loading={idx < 2 ? "eager" : "lazy"}
@@ -201,36 +193,31 @@ export default function GridSeries() {
   }, [subjects, recheckScroll]);
 
   return (
-    <div style={{ 
-      paddingLeft: "60px", 
-      paddingRight: "40px", 
-      paddingBottom: "120px",
-      marginLeft: "30px",
-    }}>
-      <div className="flex gap-8 items-start">
+    <div className="pl-6 md:pl-0 pb-20 md:pb-[120px]">
+      <div className="flex flex-col md:flex-row gap-8 md:items-start md:pl-[60px] md:pr-[40px] md:ml-[30px]">
         {/* 텍스트 카드 */}
         <motion.div
           initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 30 }}
           whileInView={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px", amount: 0.2 }}
           transition={{ duration: isMobile ? 0 : 0.6, ease: "easeOut" }}
-          className="flex-shrink-0"
-          style={{ width: "360px", marginLeft: "-30px" }}
+          className="flex-shrink-0 w-full md:w-[360px] md:-ml-[30px]"
+          style={{ marginBottom: "0" }}
         >
           <div className="text-left">
             <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-4 leading-[1.1]">
               GRID
             </h2>
-            <p className="text-lg md:text-xl text-gray-300 font-medium tracking-tight mb-6">
+            <p className="text-lg md:text-xl text-gray-300 font-medium tracking-tight mb-5 md:mb-6">
               개념&로직 [물1/화1/생1/지1]
             </p>
 
             {/* 버튼 영역 */}
-            <div className="flex" style={{ gap: '12px' }}>
-              <button className="flex items-center justify-center text-sm font-semibold text-white shadow-md hover:shadow-lg transition-all duration-200 rounded-xl" style={{ width: '120px', height: '48px', boxSizing: 'border-box', backgroundColor: 'rgb(0, 0, 0)', border: '2px solid rgb(255, 255, 255)' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgb(31, 41, 55)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgb(0, 0, 0)'}>
+            <div className="flex gap-2 md:gap-3">
+              <button className="flex items-center justify-center text-sm md:text-sm font-semibold text-white shadow-md hover:shadow-lg transition-all duration-200 rounded-xl w-[95px] h-[38px] md:w-[120px] md:h-[48px]" style={{ boxSizing: 'border-box', backgroundColor: 'rgb(0, 0, 0)', border: '2px solid rgb(255, 255, 255)' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgb(31, 41, 55)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgb(0, 0, 0)'}>
                 구입하기
               </button>
-              <button className="flex items-center justify-center text-sm font-semibold text-gray-700 hover:shadow-md hover:text-gray-900 transition-all duration-200 rounded-xl border-2 border-gray-300" style={{ width: '120px', height: '48px', boxSizing: 'border-box', backgroundColor: 'rgb(255, 255, 255)' }}>
+              <button className="flex items-center justify-center text-sm md:text-sm font-semibold text-gray-700 hover:shadow-md hover:text-gray-900 transition-all duration-200 rounded-xl border-2 border-gray-300 w-[95px] h-[38px] md:w-[120px] md:h-[48px]" style={{ boxSizing: 'border-box', backgroundColor: 'rgb(255, 255, 255)' }}>
                 더 알아보기
               </button>
             </div>
@@ -238,24 +225,24 @@ export default function GridSeries() {
         </motion.div>
 
         {/* 슬라이드 영역 */}
-        <div className="relative overflow-visible flex-1" style={{ 
+        <div className="relative overflow-visible flex-1 mt-4 md:mt-0 md:ml-[30px]" style={{ 
           minWidth: '0',
-          marginLeft: '30px',
-          marginRight: '9px'
+          marginLeft: '0',
+          marginRight: '0'
         }}>
             {/* 화살표 버튼 */}
             {/* 왼쪽 화살표 */}
             <button
               onClick={() => scroll("left")}
               disabled={!canScrollLeft}
-              className={`absolute p-2 sm:p-3 rounded-full shadow-md backdrop-blur-sm transition-all duration-300 z-20 ${
+              className={`hidden md:block absolute p-2 sm:p-3 rounded-full shadow-md backdrop-blur-sm transition-all duration-300 z-20 ${
                 canScrollLeft
                   ? "bg-white/80 hover:bg-white hover:shadow-xl hover:scale-110 cursor-pointer"
                   : "bg-white/30 opacity-40 cursor-not-allowed"
               }`}
               style={{
                 left: '-20px',
-                top: '210px',
+                top: '50%',
                 transform: 'translateY(-50%)',
               }}
               aria-label="이전 슬라이드"
@@ -267,14 +254,14 @@ export default function GridSeries() {
             <button
               onClick={() => scroll("right")}
               disabled={!canScrollRight}
-              className={`absolute p-2 sm:p-3 rounded-full shadow-md backdrop-blur-sm transition-all duration-300 z-20 ${
+              className={`hidden md:block absolute p-2 sm:p-3 rounded-full shadow-md backdrop-blur-sm transition-all duration-300 z-20 ${
                 canScrollRight
                   ? "bg-white/80 hover:bg-white hover:shadow-xl hover:scale-110 cursor-pointer"
                   : "bg-white/30 opacity-40 cursor-not-allowed"
               }`}
               style={{
                 right: '-20px',
-                top: '210px',
+                top: '50%',
                 transform: 'translateY(-50%)',
               }}
               aria-label="다음 슬라이드"
@@ -298,10 +285,9 @@ export default function GridSeries() {
                 whileInView={isMobile ? { opacity: 1 } : { opacity: 1 }}
                 viewport={{ once: true, margin: "-50px", amount: 0.2 }}
                 transition={{ duration: isMobile ? 0 : 0.6, ease: "easeOut" }}
-                className="flex overflow-x-auto scroll-smooth snap-x snap-mandatory pb-8 hide-scrollbar"
+                className="flex overflow-x-auto scroll-smooth snap-x snap-mandatory pb-8 hide-scrollbar gap-5 md:gap-[30px]"
                 style={{
                   ...optimizedStyle,
-                  gap: '30px',
                   scrollbarWidth: 'none',
                   msOverflowStyle: 'none'
                 }}

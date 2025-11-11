@@ -80,7 +80,7 @@ export default function Subjects() {
           whileInView={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px", amount: 0.2 }}
           transition={{ duration: isMobile ? 0 : 0.5, ease: "easeOut" }}
-          className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-16 md:gap-20 lg:gap-24"
+          className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 md:gap-20 lg:gap-24"
         >
             {teams.map((team, idx) => (
               <motion.div

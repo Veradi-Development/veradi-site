@@ -14,11 +14,9 @@ export default function Home() {
       <Navbar />
       <Hero />
       <section
-        className="relative"
+        className="relative pt-20 md:pt-[240px] pb-32 md:pb-[180px]"
         style={{
           background: "linear-gradient(to bottom, #1a1a1a 0%, #2a2a2a 50%, #1a1a1a 100%)",
-          paddingTop: "240px",
-          paddingBottom: "180px",
           overflow: "visible",
         }}
       >

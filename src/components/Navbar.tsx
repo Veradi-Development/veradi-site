@@ -20,7 +20,8 @@ const Navbar = memo(function Navbar() {
   const handleScroll = useCallback(() => {
     const scrollY = window.scrollY;
     const heroHeight = window.innerHeight;
-    const darkSectionEnd = heroHeight + 1500; // GridSeries2 끝
+    const isMobile = window.innerWidth < 768;
+    const darkSectionEnd = heroHeight + (isMobile ? 1400 : 1500); // GridSeries2 끝
     const subjectsEnd = darkSectionEnd + 1000; // Subjects 섹션
     
     if (scrollY < darkSectionEnd) {
@@ -41,11 +42,18 @@ const Navbar = memo(function Navbar() {
   const isHomePage = pathname === '/';
 
   const isDark = isHomePage && navState === 'dark';
-  const isLightTransparent = isHomePage && navState === 'light-transparent';
   const showDarkText = !isDark; // 어두운 섹션이 아니면 검정 텍스트
 
   return (
-    <nav className="fixed top-0 w-full z-50 transition-all duration-300 bg-transparent">
+    <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+      isHomePage 
+        ? navState === 'dark' 
+          ? 'bg-black sm:bg-transparent' 
+          : navState === 'light-transparent'
+          ? 'bg-white sm:bg-transparent'
+          : 'bg-white'
+        : 'bg-transparent'
+    }`}>
       <div className="flex items-center px-4 sm:px-6 md:px-8 py-4">
         {/* 로고 */}
         <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
