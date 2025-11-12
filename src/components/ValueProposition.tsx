@@ -7,11 +7,12 @@ export default function ValueProposition() {
   const [stage, setStage] = useState(0);
   const [offsetX, setOffsetX] = useState(0);
   const [offsetXDI, setOffsetXDI] = useState(0);
-  const [mergeScale] = useState(1); // scale 제거 (1 = 원래 크기)
+  const [mergeScale] = useState(1.4); // 합쳐질 때 1.4배로 확대
   
   const veraRef = useRef<HTMLDivElement>(null);
   const diRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  
 
   useEffect(() => {
     // 단계별 타이밍 - 각 애니메이션이 완료된 후 다음 단계 시작
@@ -48,57 +49,28 @@ export default function ValueProposition() {
       // VERA의 3/4 지점 (대략 A의 끝)
       const veraThreeQuarterPoint = veraRect.left + (veraWidth * 3 / 4);
       
-      // 화면 크기에 따른 동적 보정 (Tailwind 브레이크포인트 맞춤)
+      // 화면 크기에 따른 동적 보정 (scale 1.4 적용 버전)
       // text-4xl (<640) / sm:text-5xl (640-767) / md:text-6xl (768-1023) / lg:text-7xl (1024+)
       const screenWidth = window.innerWidth;
-      let correction = 5.5; // 기본값 (< 640px, text-4xl)
+      let correction = -7; // 기본값 (< 640px, text-4xl) - 25.76px 겹침 보정
       
       if (screenWidth >= 1024) {
-        correction = -8; // lg: text-7xl - 간격 많이 벌림
+        correction = -34; // lg: text-7xl - 27.67px 겹침 보정
       } else if (screenWidth >= 768) {
-        correction = 0; // md: text-6xl - 보정 없음
+        correction = -22; // md: text-6xl - 미세 조정 (5px 간격 보정)
       } else if (screenWidth >= 640) {
-        correction = 3; // sm: text-5xl - 약간 붙이기
+        correction = -15; // sm: text-5xl - 9.85px 겹침 보정
       }
       
       const veraOffset = containerCenter - veraThreeQuarterPoint + correction;
       const diOffset = containerCenter - diRect.left - correction;
 
-      console.log('🔍 반응형 보정:', {
-        '화면너비': screenWidth,
-        '보정값': correction,
-        '컨테이너 중심': containerCenter,
-        'VERA 3/4 지점': veraThreeQuarterPoint,
-        'DI 왼쪽': diRect.left,
-        '---': '---',
-        'VERA offset': veraOffset,
-        'DI offset': diOffset
-      });
-
       setOffsetX(veraOffset);
       setOffsetXDI(diOffset);
     };
 
-    // Stage 2 완료 직전에 계산 (DI가 나타난 후, 합치기 시작 전)
+    // Stage 2 완료 직전에 한 번만 계산 (DI가 나타난 후, 합치기 시작 전)
     const initialTimer = setTimeout(updateOffset, 1200);
-    
-    // 합쳐진 후 실제 위치 확인 (디버그용)
-    const checkAfterMerge = setTimeout(() => {
-      if (!veraRef.current || !diRef.current) return;
-      
-      const veraRect = veraRef.current.getBoundingClientRect();
-      const diRect = diRef.current.getBoundingClientRect();
-      
-      console.log('✅ 합쳐진 후 실제 위치:', {
-        'VERA 오른쪽 끝 (이동 후)': veraRect.right,
-        'DI 왼쪽 시작 (이동 후)': diRect.left,
-        '차이': diRect.left - veraRect.right,
-        '겹침?': veraRect.right > diRect.left ? `${veraRect.right - diRect.left}px 겹침` : `${diRect.left - veraRect.right}px 간격`
-      });
-    }, 2000);
-    
-    // 리사이즈 시 재계산
-    window.addEventListener("resize", updateOffset);
     
     // 폰트 로딩 완료 후 재계산
     if (document.fonts && document.fonts.ready) {
@@ -109,8 +81,6 @@ export default function ValueProposition() {
 
     return () => {
       clearTimeout(initialTimer);
-      clearTimeout(checkAfterMerge);
-      window.removeEventListener("resize", updateOffset);
     };
   }, [mergeScale]);
 

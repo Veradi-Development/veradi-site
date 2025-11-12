@@ -23,8 +23,8 @@ type BookData = {
   id: string;
   title: string;
   subject: string;
-  series: string;
-  front: string | null;
+  main_image_url: string | null; // 문제집 이미지
+  sub_image_url: string | null; // 해설집 이미지
   link: string;
   display_order: number;
 };
@@ -43,7 +43,7 @@ type PublicationSection = {
   use_subjects_background: boolean;
 };
 
-// 교재 섹션 컴포넌트
+// 교재 섹션 컴포넌트 (GridSeries 스타일)
 function BookSeriesSection({
   title,
   books,
@@ -56,46 +56,76 @@ function BookSeriesSection({
   useSubjectsBackground?: boolean;
 }) {
   const isMobile = useMobileDetect();
-  const { scrollRef, canScrollLeft, canScrollRight, scroll } = useHorizontalScroll({
+  const { scrollRef, canScrollLeft, canScrollRight, scroll, recheckScroll } = useHorizontalScroll({
     scrollAmountRatio: SCROLL_AMOUNT_RATIO,
   });
   
   if (books.length === 0) return null;
 
+  // 카드 배경 색상 (GridSeries 스타일)
+  const cardBgs = [
+    'linear-gradient(135deg, rgb(29, 78, 216) 0%, rgb(30, 64, 175) 50%, rgb(37, 99, 235) 100%)',
+    'linear-gradient(135deg, rgb(154, 52, 18) 0%, rgb(194, 65, 12) 50%, rgb(234, 88, 12) 100%)',
+    'linear-gradient(135deg, rgb(20, 83, 45) 0%, rgb(22, 101, 52) 50%, rgb(21, 128, 61) 100%)',
+    'linear-gradient(135deg, rgb(30, 27, 75) 0%, rgb(49, 46, 129) 50%, rgb(67, 56, 202) 100%)',
+  ];
+
   // 배경 스타일 선택
   const backgroundStyle = useSubjectsBackground ? {
-    backgroundImage: `
-      radial-gradient(circle at 20% 30%, rgba(0, 0, 0, 0.015) 1px, transparent 1px),
-      radial-gradient(circle at 60% 70%, rgba(0, 0, 0, 0.012) 1px, transparent 1px),
-      radial-gradient(circle at 40% 50%, rgba(0, 0, 0, 0.01) 1px, transparent 1px),
-      radial-gradient(circle at 80% 10%, rgba(0, 0, 0, 0.013) 1px, transparent 1px),
-      radial-gradient(circle at 15% 80%, rgba(0, 0, 0, 0.011) 1px, transparent 1px),
-      linear-gradient(to bottom, white, rgb(239, 246, 255))
-    `,
-    backgroundSize: '3px 3px, 5px 5px, 4px 4px, 6px 6px, 5px 5px, 100% 100%',
-    backgroundPosition: '0 0, 1px 1px, 2px 2px, 3px 3px, 4px 4px, 0 0'
-  } : {
-    backgroundImage: "linear-gradient(90deg, rgba(0,0,0,0.07) 1px, transparent 1px), linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px)",
-    backgroundSize: "80px 80px",
-    backgroundPosition: "center center",
-    backgroundColor: "#f8fafc",
-  };
+    // 크림 배경 (Subjects.tsx와 동일)
+    background: 'linear-gradient(to bottom, #f5f1eb 0%, #ede8e1 50%, #e8e3dc 100%)',
+  } : {}; // 그리드 배경은 section에 직접 적용
 
   return (
     <section 
-      className="relative py-16 sm:py-24 md:py-32 px-4 sm:px-6 overflow-visible"
-      style={backgroundStyle}
+      className="relative overflow-x-hidden overflow-y-visible"
+      style={useSubjectsBackground ? backgroundStyle : {
+        background: "linear-gradient(to bottom, #1a1a1a 0%, #2a2a2a 50%, #1a1a1a 100%)",
+      }}
     >
-      <div className="max-w-7xl mx-auto relative overflow-visible">
-        {/* 제목 + 더 알아보기 링크 */}
-        <motion.div
-          initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 30 }}
-          whileInView={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px", amount: 0.2 }}
-          transition={{ duration: isMobile ? 0 : 0.5, ease: "easeOut" }}
-          className="flex items-center justify-between mb-4"
+      {/* 그리드 배경일 때만 그리드 패턴 표시 */}
+      {!useSubjectsBackground && (
+        <div 
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `
+              linear-gradient(90deg, rgba(255, 255, 255, 0.15) 1px, transparent 1px),
+              linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px)
+            `,
+            backgroundSize: "60px 60px",
+            backgroundPosition: "60px 0",
+          }}
+        />
+      )}
+      
+      {/* 레이아웃: 크림 배경은 세로, 그리드 배경은 좌우 */}
+      <div className={`pl-6 md:pl-0 pb-20 md:pb-[120px] pt-16 sm:pt-20 md:pt-24 lg:pt-28 ${
+        useSubjectsBackground ? '' : ''
+      }`}>
+        <div className={`flex flex-col gap-8 ${
+          useSubjectsBackground 
+            ? 'md:flex-col px-4 sm:px-6 md:px-8 lg:px-12' // 크림: 세로 배치, 적절한 패딩
+            : 'md:flex-row md:items-start md:pl-[60px] md:pr-0 md:ml-[30px]' // 그리드: 좌우 배치
+        }`}>
+          {/* 텍스트 카드 */}
+          <motion.div
+            initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 30 }}
+            whileInView={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px", amount: 0.2 }}
+            transition={{ duration: isMobile ? 0 : 0.6, ease: "easeOut" }}
+            className={`flex-shrink-0 w-full ${
+              useSubjectsBackground 
+                ? '' // 크림: 전체 너비
+                : 'md:w-[360px] md:-ml-[60px]' // 그리드: 고정 너비 + 왼쪽으로
+            }`}
+            style={{ marginBottom: "0" }}
         >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 leading-tight tracking-tight">
+            <div className="text-left">
+              <h2 className={`text-4xl md:text-[42px] lg:text-[45px] font-bold tracking-tight ${
+                useSubjectsBackground ? 'mb-6' : 'mb-4'
+              } leading-[1.1] ${
+                useSubjectsBackground ? 'text-gray-900' : 'text-white'
+              }`}>
             {title}
           </h2>
           
@@ -105,7 +135,11 @@ function BookSeriesSection({
               href={guideUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sky-600 hover:text-sky-700 text-sm sm:text-base font-medium whitespace-nowrap flex items-center gap-1 group transition-colors"
+              className={`inline-flex items-center gap-1 text-sm md:text-base font-medium group transition-colors ${
+                useSubjectsBackground 
+                  ? 'text-sky-600 hover:text-sky-700'
+                  : 'text-gray-300 hover:text-white'
+              }`}
             >
               더 알아보기
               <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -113,138 +147,285 @@ function BookSeriesSection({
               </svg>
             </a>
           )}
-        </motion.div>
+            </div>
+          </motion.div>
 
-        {/* 화살표 버튼 */}
-        <div className="pointer-events-none absolute inset-y-0 left-0 right-0 flex justify-between items-center z-20 px-2 sm:px-4 md:px-6">
-          <button
-            onClick={() => scroll("left")}
-            disabled={!canScrollLeft}
-            className={`pointer-events-auto p-2 sm:p-3 rounded-full shadow-md backdrop-blur-sm transition-all duration-300 ${
-              canScrollLeft
-                ? "bg-white/70 hover:bg-white hover:shadow-lg hover:scale-110"
-                : "bg-gray-200/50 cursor-not-allowed opacity-40"
-            }`}
-            aria-label="이전"
-          >
-            <ArrowLeft className={`w-5 h-5 sm:w-6 sm:h-6 transition-colors ${
-              canScrollLeft ? "text-gray-700" : "text-gray-400"
-            }`} />
-          </button>
+          {/* 슬라이드 영역 */}
+          <div className={`relative overflow-visible ${
+            useSubjectsBackground 
+              ? 'w-full mt-8' // 크림: 전체 너비, 위에서 간격
+              : 'flex-1 mt-4 md:mt-0 md:ml-[30px]' // 그리드: 유동 너비
+          }`} style={ 
+            useSubjectsBackground ? {} : {
+              minWidth: '0',
+              marginLeft: '0',
+              marginRight: '0'
+            }
+          }>
+            {/* 화살표 버튼 */}
+            {!isMobile && !useSubjectsBackground && (
+              // 그리드 배경일 때만 표시
+              <>
+                <button
+                  onClick={() => scroll("left")}
+                  disabled={!canScrollLeft}
+                  className={`hidden md:block absolute p-2 sm:p-3 rounded-full shadow-md backdrop-blur-sm transition-all duration-300 z-20 ${
+                    canScrollLeft
+                      ? "bg-white/80 hover:bg-white hover:shadow-xl hover:scale-110 cursor-pointer"
+                      : "bg-white/30 opacity-40 cursor-not-allowed"
+                  }`}
+                  style={{
+                    left: '-20px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                  }}
+                  aria-label="이전 슬라이드"
+                >
+                  <ArrowLeft className={`w-5 h-5 sm:w-6 sm:h-6 transition-colors ${canScrollLeft ? "text-gray-700" : "text-gray-400"}`} />
+                </button>
 
-          <button
-            onClick={() => scroll("right")}
-            disabled={!canScrollRight}
-            className={`pointer-events-auto p-2 sm:p-3 rounded-full shadow-md backdrop-blur-sm transition-all duration-300 ${
-              canScrollRight
-                ? "bg-white/70 hover:bg-white hover:shadow-lg hover:scale-110"
-                : "bg-gray-200/50 cursor-not-allowed opacity-40"
-            }`}
-            aria-label="다음"
-          >
-            <ArrowRight className={`w-5 h-5 sm:w-6 sm:h-6 transition-colors ${
-              canScrollRight ? "text-gray-700" : "text-gray-400"
-            }`} />
-          </button>
-        </div>
+                <button
+                  onClick={() => scroll("right")}
+                  disabled={!canScrollRight}
+                  className={`hidden md:block absolute p-2 sm:p-3 rounded-full shadow-md backdrop-blur-sm transition-all duration-300 z-20 ${
+                    canScrollRight
+                      ? "bg-white/80 hover:bg-white hover:shadow-xl hover:scale-110 cursor-pointer"
+                      : "bg-white/30 opacity-40 cursor-not-allowed"
+                  }`}
+                  style={{
+                    right: '20px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                  }}
+                  aria-label="다음 슬라이드"
+                >
+                  <ArrowRight className={`w-5 h-5 sm:w-6 sm:h-6 transition-colors ${canScrollRight ? "text-gray-700" : "text-gray-400"}`} />
+                </button>
+              </>
+            )}
 
-        {/* 수평 스크롤 카드 컨테이너 */}
+            {/* 카드 컨테이너 */}
         <motion.div
           ref={scrollRef}
-          initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 30 }}
-          whileInView={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
+              initial={isMobile ? { opacity: 1 } : { opacity: 0 }}
+              whileInView={isMobile ? { opacity: 1 } : { opacity: 1 }}
           viewport={{ once: true, margin: "-50px", amount: 0.2 }}
-          transition={{ duration: isMobile ? 0 : 0.5, ease: "easeOut" }}
-          className="flex gap-6 sm:gap-8 md:gap-10 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-8 overflow-visible"
+              transition={{ duration: isMobile ? 0 : 0.6, ease: "easeOut" }}
+              className="flex overflow-x-auto scroll-smooth snap-x snap-mandatory pb-8 hide-scrollbar gap-5 md:gap-[30px]"
           style={{
             ...optimizedStyle,
             scrollbarWidth: 'none',
             msOverflowStyle: 'none'
           }}
         >
-          {books.map((book, idx) => (
-            <motion.div
-              key={book.id}
-              initial={isMobile ? { opacity: 1 } : { opacity: 0, x: 30 }}
-              whileInView={isMobile ? { opacity: 1 } : { opacity: 1, x: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ 
-                duration: isMobile ? 0 : 0.4, 
-                delay: isMobile ? 0 : Math.min(idx * 0.06, 0.3),
-                ease: "easeOut" 
-              }}
-              whileHover={isMobile ? {} : { scale: CARD_HOVER_SCALE }}
-              className={`relative flex-shrink-0 w-[320px] sm:w-[360px] md:w-[400px] lg:w-[420px]
-                         bg-white rounded-3xl shadow-lg border border-gray-100
-                         overflow-visible snap-center flex flex-col ${isMobile ? '' : 'hover:shadow-2xl transition-shadow duration-300'}`}
-              style={optimizedStyle}
-            >
-              {/* 상단 텍스트 영역 */}
-              <div className="flex-shrink-0 p-6 sm:p-8 pb-4 sm:pb-6">
-                <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">
-                  {book.subject}{" "}
-                  <span className="text-sky-600">{book.series}</span>
-                </h3>
-              </div>
-
-              {/* 이미지 영역 */}
-              <div className="flex-1 min-h-[240px] sm:min-h-[300px] md:min-h-[340px] lg:min-h-[380px] py-4 sm:py-6 flex items-center justify-center relative perspective-[1200px] overflow-visible z-10">
-                {book.front ? (
-                  <motion.div
-                    initial={{ rotateY: 0 }}
-                    whileHover={isMobile ? {} : { rotateY: 20 }}
-                    transition={{ duration: 0.6, ease: "easeInOut" }}
-                    className="relative w-40 h-56 sm:w-52 sm:h-72 md:w-60 md:h-80 lg:w-64 lg:h-[22rem] transform-style-preserve-3d overflow-visible"
-                    style={{
-                      ...optimizedStyle,
-                      transformOrigin: "center center"
-                    }}
-                  >
-                    {/* 앞표지 */}
-                    <div
-                      className="absolute inset-0 bg-white rounded-md overflow-hidden shadow-[0_25px_50px_rgba(0,0,0,0.45)]"
-                      style={{ transform: "translateZ(0px)" }}
-                    >
-                      <Image
-                        src={book.front}
-                        alt={`${book.subject} 앞표지`}
-                        fill
-                        sizes="(max-width: 640px) 160px, (max-width: 768px) 208px, (max-width: 1024px) 240px, 256px"
-                        className="object-cover"
-                        quality={75}
-                        loading={idx < 2 ? "eager" : "lazy"}
-                        placeholder="blur"
-                        blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mN8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg=="
-                      />
-                    </div>
-                  </motion.div>
-                ) : (
-                  <div className="bg-gray-100 w-40 h-56 sm:w-52 sm:h-72 md:w-60 md:h-80 lg:w-64 lg:h-[22rem] flex items-center justify-center text-gray-400 text-xs sm:text-sm rounded-md">
-                    {book.subject} 교재 이미지
-                  </div>
+          {books.map((book, idx) => {
+            // 그리드 배경일 때만 컬러풀 카드 배경 사용
+            const bg = useSubjectsBackground ? 'white' : cardBgs[idx % 4];
+            
+            return (
+              <div
+                key={book.id}
+                className={`relative flex-shrink-0 snap-start overflow-visible rounded-3xl ${
+                  useSubjectsBackground 
+                    ? 'w-[260px] sm:w-[280px] md:w-[300px] lg:w-[320px]'
+                    : 'w-[300px] sm:w-[400px] md:w-[480px]'
+                } ${
+                  useSubjectsBackground
+                    ? 'h-auto'
+                    : 'h-[350px] sm:h-[380px] md:h-[420px]'
+                }`}
+                style={{
+                  ...optimizedStyle,
+                  scrollSnapAlign: 'start',
+                }}
+              >
+                {/* 카드 배경 */}
+                {!useSubjectsBackground && (
+                  <>
+                    <div 
+                      className="absolute inset-0 transition-all duration-300"
+                      style={{
+                        background: bg,
+                        backdropFilter: 'blur(4px)',
+                        borderRadius: '32px',
+                      }}
+                    />
+                    
+                    {/* 윤기 효과 */}
+                    <div 
+                      className="absolute inset-0 pointer-events-none"
+                      style={{
+                        background: 'radial-gradient(ellipse at 15% 15%, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 20%, transparent 45%)',
+                        borderRadius: '32px',
+                      }}
+                    />
+                    
+                    {/* 테두리 */}
+                    <div 
+                      className={`absolute inset-0 pointer-events-none transition-all duration-300 ${
+                        isMobile ? '' : 'group-hover:border-blue-400'
+                      }`}
+                      style={{
+                        border: '2px solid rgb(255, 255, 255)',
+                        borderRadius: '32px',
+                      }}
+                    />
+                  </>
                 )}
-              </div>
 
-              {/* 하단 버튼 */}
-              <div className="flex-shrink-0 flex justify-center items-center gap-3 px-6 sm:px-8 py-4 sm:py-6 border-t border-gray-100 bg-white/70 backdrop-blur-sm rounded-b-3xl">
+                {useSubjectsBackground ? (
+                  // 크림 배경: 하얀 카드 + 교재 하나 + 과목명 위에
+                  <div className="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden">
+                    {/* 이미지 영역 */}
+                    <a
+                      href={book.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block perspective-[1200px] overflow-visible group relative"
+                    >
+                      {/* 과목명 - 이미지 위 가운데 */}
+                      <div className="absolute top-4 left-0 right-0 z-10 text-center">
+                        <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 drop-shadow-[0_2px_4px_rgba(255,255,255,0.8)]">
+                          {book.subject}
+                        </h3>
+                      </div>
+
+                      {book.main_image_url ? (
+                        <motion.div
+                          initial={{ rotateY: 0 }}
+                          whileHover={isMobile ? {} : { rotateY: 20 }}
+                          transition={{ duration: 0.6, ease: "easeInOut" }}
+                          className="relative w-full aspect-[3/4] transform-style-preserve-3d p-10 sm:p-12 md:p-14"
+                          style={{
+                            ...optimizedStyle,
+                            transformOrigin: "center center"
+                          }}
+                        >
+                          <div className="relative w-full h-full overflow-hidden rounded-lg shadow-[0_20px_40px_rgba(0,0,0,0.4)] hover:shadow-[0_25px_50px_rgba(0,0,0,0.5)] transition-shadow duration-300">
+                            <Image
+                              src={book.main_image_url}
+                              alt={`${book.subject}`}
+                              fill
+                              sizes="(max-width: 640px) 250px, (max-width: 768px) 280px, 320px"
+                              className="object-cover"
+                              quality={75}
+                              loading={idx < 2 ? "eager" : "lazy"}
+                              placeholder="blur"
+                              blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mN8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg=="
+                              onLoad={() => recheckScroll()}
+                            />
+                          </div>
+                          
+                          {/* 구입하기 오버레이 */}
+                          <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none transform group-hover:translate-y-0 translate-y-2">
+                            <span className="bg-white text-black px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg border border-gray-200">
+                              구입하기
+                            </span>
+                          </div>
+                        </motion.div>
+                      ) : (
+                        <div className="w-full aspect-[3/4] bg-gray-100 rounded-lg flex items-center justify-center text-gray-400 text-xs shadow-lg p-4">
+                          이미지 없음
+                        </div>
+                      )}
+                    </a>
+                  </div>
+                ) : (
+                  // 그리드 배경: GridSeries 스타일 (컬러풀 카드 + 교재 두 개)
                 <a
                   href={book.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 sm:gap-2 px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-sky-500 to-sky-600 rounded-xl hover:from-sky-600 hover:to-sky-700 transition-all duration-200 shadow-md hover:shadow-lg"
-                >
-                  <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  <span>구입하기</span>
-                </a>
+                    className={`group relative w-full h-full flex flex-col items-center justify-center p-6 cursor-pointer ${isMobile ? 'pointer-events-auto' : ''}`}
+                  >
+                    {/* 과목명 */}
+                    <h3 className="absolute top-3 sm:top-4 left-1/2 -translate-x-1/2 text-lg sm:text-xl md:text-2xl font-bold text-black z-30" style={{ textShadow: '0 1px 3px rgba(255,255,255,0.2)' }}>
+                      {book.subject}
+                    </h3>
+
+                    {/* 책 이미지 컨테이너 - 겹치게 배치 */}
+                    <motion.div 
+                      className="relative flex items-center justify-center h-full" 
+                      style={{ marginTop: '30px' }}
+                      whileHover={isMobile ? {} : { y: -10 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      {/* 해설집 (뒤쪽) */}
+                      {book.sub_image_url && (
+                        <div 
+                          className={`relative overflow-hidden bg-white border-2 border-gray-200 ${isMobile ? '' : 'group-hover:border-blue-400 transition-all duration-300'} w-[165px] h-[230px] sm:w-[160px] sm:h-[220px] md:w-[200px] md:h-[280px]`}
+                          style={{
+                            ...optimizedStyle,
+                            boxShadow: '0 30px 70px rgba(0,0,0,0.7), 0 20px 40px rgba(0,0,0,0.6), 0 10px 20px rgba(0,0,0,0.5)',
+                            zIndex: 1,
+                          }}
+                        >
+                          <Image
+                            src={book.sub_image_url}
+                            alt={`${book.subject} 해설집`}
+                            fill
+                            sizes="(max-width: 640px) 165px, (max-width: 768px) 160px, 200px"
+                            className="object-cover"
+                            quality={75}
+                            loading={idx < 2 ? "eager" : "lazy"}
+                            placeholder="blur"
+                            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mN8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg=="
+                            onLoad={() => recheckScroll()}
+                          />
+                        </div>
+                      )}
+
+                      {/* 문제집 (앞쪽) */}
+                      {book.main_image_url && (
+                        <div 
+                          className={`relative overflow-hidden bg-white border-2 border-gray-200 ${isMobile ? '' : 'group-hover:border-blue-400 transition-all duration-300'} w-[165px] h-[230px] sm:w-[160px] sm:h-[220px] md:w-[200px] md:h-[280px] ${book.sub_image_url ? '-ml-[85px] sm:-ml-[60px] md:-ml-[80px] -mt-[45px] sm:-mt-[35px] md:-mt-[50px]' : ''}`}
+                          style={{
+                            ...optimizedStyle,
+                            boxShadow: '0 40px 90px rgba(0,0,0,0.8), 0 30px 60px rgba(0,0,0,0.7), 0 20px 40px rgba(0,0,0,0.6)',
+                            zIndex: 2,
+                          }}
+                        >
+                          <Image
+                            src={book.main_image_url}
+                            alt={`${book.subject} 문제집`}
+                            fill
+                            sizes="(max-width: 640px) 165px, (max-width: 768px) 160px, 200px"
+                            className="object-cover"
+                            quality={75}
+                            loading={idx < 2 ? "eager" : "lazy"}
+                            placeholder="blur"
+                            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mN8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg=="
+                            onLoad={() => recheckScroll()}
+                          />
+                        </div>
+                      )}
+                    </motion.div>
+
+                    {/* 구입하기 버튼 - 호버 시 표시 */}
+                    {book.link && (
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-30">
+                        <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/95 backdrop-blur-sm text-gray-900 px-8 py-3 rounded-lg text-base font-bold shadow-2xl pointer-events-auto border-2 border-gray-800">
+                          구입하기
+                        </span>
+                      </div>
+                    )}
+                  </a>
+                )}
               </div>
+            );
+          })}
             </motion.div>
-          ))}
-        </motion.div>
+          </div>
+        </div>
       </div>
 
       {/* 스크롤바 숨김 */}
       <style jsx>{`
-        .overflow-x-auto::-webkit-scrollbar {
+        .hide-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
           display: none;
         }
       `}</style>
@@ -290,8 +471,8 @@ export default function Publications() {
               id: string;
               title: string;
               subject: string;
-              series?: string;
-              front_image_url: string | null;
+              main_image_url: string | null;
+              sub_image_url: string | null;
               purchase_link?: string;
               display_order?: number;
               category?: string;
@@ -305,8 +486,8 @@ export default function Publications() {
                   id: book.id,
                   title: book.title,
                   subject: book.subject,
-                  series: book.series || '',
-                  front: book.front_image_url,
+                  main_image_url: book.main_image_url,
+                  sub_image_url: book.sub_image_url,
                   link: book.purchase_link || '#',
                   display_order: book.display_order || 0,
                 });
@@ -370,7 +551,7 @@ export default function Publications() {
             className="relative rounded-3xl overflow-hidden shadow-2xl"
           >
             {/* 배경 이미지 - 책 들고 있는 사람 */}
-            <div className="relative w-full h-[400px] sm:h-[450px] md:h-[500px] lg:h-[550px]">
+            <div className="relative w-full h-[300px] sm:h-[400px] md:h-[500px] lg:h-[550px]">
               {guide?.hero_image_url ? (
                 <Image 
                   src={guide.hero_image_url} 
@@ -397,11 +578,11 @@ export default function Publications() {
                     initial={isMobile ? { opacity: 1 } : { opacity: 0, x: -30 }}
                     animate={isMobile ? { opacity: 1 } : { opacity: 1, x: 0 }}
                     transition={{ duration: isMobile ? 0 : 0.5, delay: isMobile ? 0 : 0.2 }}
-                    className="space-y-5 sm:space-y-6 text-center"
+                    className="space-y-4 sm:space-y-6 text-center"
                   >
                     <div>
                       <h2 
-                        className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight"
+                        className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 leading-tight"
                         dangerouslySetInnerHTML={{ __html: guide?.hero_title || 'VERADI 교재,<br />제대로 활용하기' }}
                       />
                     </div>
@@ -413,10 +594,10 @@ export default function Publications() {
                           href={guide.video_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-sky-600 hover:bg-sky-700 text-white font-semibold rounded-full transition-all duration-200 hover:shadow-xl group"
+                          className="inline-flex items-center gap-1.5 px-4 sm:px-5 py-2 sm:py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-semibold rounded-full transition-all duration-200 hover:shadow-xl group text-xs sm:text-sm"
                         >
-                          <Play className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" />
-                          <span className="text-sm sm:text-base">동영상 보기</span>
+                          <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="currentColor" />
+                          <span>동영상 보기</span>
                         </a>
                       </div>
                     )}
