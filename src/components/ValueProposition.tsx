@@ -1,14 +1,17 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 
 export default function ValueProposition() {
   const [stage, setStage] = useState(0);
-  const [offsetX, setOffsetX] = useState(12);
-  const [offsetXDI, setOffsetXDI] = useState(12);
-  const [mergeScale] = useState(1.4);
-  const [spacingCount, setSpacingCount] = useState(1);
+  const [offsetX, setOffsetX] = useState(0);
+  const [offsetXDI, setOffsetXDI] = useState(0);
+  const [mergeScale] = useState(1); // scale 제거 (1 = 원래 크기)
+  
+  const veraRef = useRef<HTMLDivElement>(null);
+  const diRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // 단계별 타이밍 - 각 애니메이션이 완료된 후 다음 단계 시작
@@ -24,79 +27,92 @@ export default function ValueProposition() {
   }, []);
 
   useEffect(() => {
-    // 화면 크기에 따른 offset 조정
+    // 가장 간단하게: 간격을 반으로 나눠서 서로 다가가기
     const updateOffset = () => {
-      if (window.innerWidth < 350) {
-        setOffsetX(44);
-        setOffsetXDI(30);
-        setSpacingCount(2);
-      } else if (window.innerWidth < 370) {
-        setOffsetX(48);
-        setOffsetXDI(35);
-        setSpacingCount(2);
-      } else if (window.innerWidth < 380) {
-        setOffsetX(52);
-        setOffsetXDI(40);
-        setSpacingCount(2);
-      } else if (window.innerWidth < 400) {
-        setOffsetX(60);
-        setOffsetXDI(42);
-        setSpacingCount(2);
-      } else if (window.innerWidth < 420) {
-        setOffsetX(64);
-        setOffsetXDI(49);
-        setSpacingCount(2);
-      } else if (window.innerWidth < 450) {
-        setOffsetX(70);
-        setOffsetXDI(54);
-        setSpacingCount(2);
-      } else if (window.innerWidth < 480) {
-        setOffsetX(66);
-        setOffsetXDI(50);
-        setSpacingCount(2);
-      } else if (window.innerWidth < 500) {
-        setOffsetX(66);
-        setOffsetXDI(50);
-        setSpacingCount(2);
-      }else if (window.innerWidth < 520) {
-        setOffsetX(83);
-        setOffsetXDI(72);
-        setSpacingCount(2);
-      } else if (window.innerWidth < 540) {
-        setOffsetX(87);
-        setOffsetXDI(78);
-        setSpacingCount(2);
-      } else if (window.innerWidth < 580) {
-        setOffsetX(95);
-        setOffsetXDI(78);
-        setSpacingCount(2);
-      } else if (window.innerWidth < 640) {
-        setOffsetX(92);
-        setOffsetXDI(80);
-        setSpacingCount(2);
-      } else if (window.innerWidth < 768) {
-        setOffsetX(78);
-        setOffsetXDI(57);
-        setSpacingCount(2);
-      } else if (window.innerWidth < 1024) {
-        setOffsetX(67);
-        setOffsetXDI(32);
-        setSpacingCount(2);
-      } else if (window.innerWidth < 1440) {
-        setOffsetX(65);
-        setOffsetXDI(15);
-        setSpacingCount(1);
-      } else {
-        setOffsetX(70);
-        setOffsetXDI(12);
-        setSpacingCount(1);
+      if (!veraRef.current || !diRef.current || !containerRef.current) return;
+
+      const veraRect = veraRef.current.getBoundingClientRect();
+      const diRect = diRef.current.getBoundingClientRect();
+      const containerRect = containerRef.current.getBoundingClientRect();
+
+      // VERA는 4글자, DI는 2글자
+      // 합치면 VERADI = 6글자
+      // 중앙은 A와 D 사이 = VERA의 3/4 지점
+      
+      const veraWidth = veraRect.width;
+      const diWidth = diRect.width;
+      
+      // 컨테이너 중심
+      const containerCenter = containerRect.left + containerRect.width / 2;
+      
+      // VERA의 3/4 지점 (대략 A의 끝)
+      const veraThreeQuarterPoint = veraRect.left + (veraWidth * 3 / 4);
+      
+      // 화면 크기에 따른 동적 보정 (Tailwind 브레이크포인트 맞춤)
+      // text-4xl (<640) / sm:text-5xl (640-767) / md:text-6xl (768-1023) / lg:text-7xl (1024+)
+      const screenWidth = window.innerWidth;
+      let correction = 5.5; // 기본값 (< 640px, text-4xl)
+      
+      if (screenWidth >= 1024) {
+        correction = -8; // lg: text-7xl - 간격 많이 벌림
+      } else if (screenWidth >= 768) {
+        correction = 0; // md: text-6xl - 보정 없음
+      } else if (screenWidth >= 640) {
+        correction = 3; // sm: text-5xl - 약간 붙이기
       }
+      
+      const veraOffset = containerCenter - veraThreeQuarterPoint + correction;
+      const diOffset = containerCenter - diRect.left - correction;
+
+      console.log('🔍 반응형 보정:', {
+        '화면너비': screenWidth,
+        '보정값': correction,
+        '컨테이너 중심': containerCenter,
+        'VERA 3/4 지점': veraThreeQuarterPoint,
+        'DI 왼쪽': diRect.left,
+        '---': '---',
+        'VERA offset': veraOffset,
+        'DI offset': diOffset
+      });
+
+      setOffsetX(veraOffset);
+      setOffsetXDI(diOffset);
     };
 
-    updateOffset();
+    // Stage 2 완료 직전에 계산 (DI가 나타난 후, 합치기 시작 전)
+    const initialTimer = setTimeout(updateOffset, 1200);
+    
+    // 합쳐진 후 실제 위치 확인 (디버그용)
+    const checkAfterMerge = setTimeout(() => {
+      if (!veraRef.current || !diRef.current) return;
+      
+      const veraRect = veraRef.current.getBoundingClientRect();
+      const diRect = diRef.current.getBoundingClientRect();
+      
+      console.log('✅ 합쳐진 후 실제 위치:', {
+        'VERA 오른쪽 끝 (이동 후)': veraRect.right,
+        'DI 왼쪽 시작 (이동 후)': diRect.left,
+        '차이': diRect.left - veraRect.right,
+        '겹침?': veraRect.right > diRect.left ? `${veraRect.right - diRect.left}px 겹침` : `${diRect.left - veraRect.right}px 간격`
+      });
+    }, 2000);
+    
+    // 리사이즈 시 재계산
     window.addEventListener("resize", updateOffset);
-    return () => window.removeEventListener("resize", updateOffset);
-  }, []);
+    
+    // 폰트 로딩 완료 후 재계산
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => {
+        setTimeout(updateOffset, 1200);
+      });
+    }
+
+    return () => {
+      clearTimeout(initialTimer);
+      clearTimeout(checkAfterMerge);
+      window.removeEventListener("resize", updateOffset);
+    };
+  }, [mergeScale]);
 
   // 애니메이션 설정 메모이제이션
   const glowAnimation = useMemo(() => ({
@@ -167,63 +183,93 @@ export default function ValueProposition() {
 
             {/* VERA + DI가 합쳐지는 컨테이너 */}
             <motion.div
+              ref={containerRef}
               className="relative z-10 w-full flex items-center justify-center"
             >
               {/* VERA - 고정 너비 컨테이너 */}
-              <div style={{ width: '200px', display: 'flex', justifyContent: 'center' }}>
+              <div style={{ 
+                width: '200px', 
+                display: 'flex', 
+                justifyContent: 'center'
+              }}>
                 {stage >= 1 && (
                   <motion.div
+                    ref={veraRef}
                     initial={{ x: -200, opacity: 0 }}
                     animate={
                       stage >= 3
-                        ? { x: offsetX, opacity: 1, scale: mergeScale }
+                        ? { 
+                            x: offsetX, 
+                            opacity: 1, 
+                            scale: mergeScale,
+                            ...glowAnimation 
+                          }
                         : { x: 0, opacity: 1, scale: 1 }
                     }
-                    transition={{ 
-                      type: "tween",
-                      duration: 0.5,
-                      ease: [0.165, 0.84, 0.44, 1]
-                    }}
-                    className="text-center"
+                    transition={
+                      stage >= 3
+                        ? {
+                            x: { type: "tween", duration: 0.5, ease: [0.165, 0.84, 0.44, 1] },
+                            opacity: { type: "tween", duration: 0.5, ease: [0.165, 0.84, 0.44, 1] },
+                            scale: { type: "tween", duration: 0.5, ease: [0.165, 0.84, 0.44, 1] },
+                            filter: { duration: 2, repeat: Infinity, ease: "easeInOut" }
+                          }
+                        : { type: "tween", duration: 0.5, ease: [0.165, 0.84, 0.44, 1] }
+                    }
                     style={{ 
-                      willChange: 'transform, opacity'
+                      willChange: 'transform, opacity',
+                      display: 'inline-block'
                     }}
                   >
-                <motion.div 
-                  className={`text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-2 sm:mb-3 ${
+                <div 
+                  className={`text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold ${
                     stage >= 3
                       ? ""
                       : "text-sky-700"
                   }`}
-                  style={stage >= 3 ? { color: '#121945' } : {}}
-                  animate={stage >= 3 ? glowAnimation : {}}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
+                  style={
+                    stage >= 3 
+                      ? { 
+                          color: '#121945',
+                          padding: 0,
+                          margin: 0,
+                          lineHeight: 1,
+                          letterSpacing: 0
+                        } 
+                      : {
+                          padding: 0,
+                          margin: 0,
+                          lineHeight: 1,
+                          letterSpacing: 0
+                        }
+                  }
                 >
-                  {'\u00A0'.repeat(spacingCount)}VERA
-                </motion.div>
+                  VERA
+                </div>
+                {stage < 3 && (
                 <motion.div
-                  animate={stage >= 3 ? { opacity: 0 } : { opacity: 1 }}
+                    initial={{ opacity: 1 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
                   className="text-sm sm:text-base md:text-lg text-sky-600"
                 >
                   VERITAS
                   <div className="text-xs sm:text-sm text-gray-600">진실</div>
                 </motion.div>
+                )}
                   </motion.div>
                 )}
               </div>
 
-              {/* + 기호 - 항상 80px 유지 */}
+              {/* + 기호 */}
               <div 
                 style={{ 
                   width: '80px',
                   display: 'flex', 
                   justifyContent: 'center', 
-                  alignItems: 'center' 
+                  alignItems: 'center',
+                  overflow: 'hidden'
                 }}
               >
                 {stage >= 2 && stage < 3 && (
@@ -243,49 +289,77 @@ export default function ValueProposition() {
               </div>
 
               {/* DI - 고정 너비 컨테이너 */}
-              <div style={{ width: '200px', display: 'flex', justifyContent: 'center' }}>
+              <div style={{ 
+                width: '200px', 
+                display: 'flex', 
+                justifyContent: 'center'
+              }}>
                 {stage >= 2 && (
                   <motion.div
+                    ref={diRef}
                     initial={{ x: 200, opacity: 0 }}
                     animate={
                       stage >= 3
-                        ? { x: -offsetXDI, opacity: 1, scale: mergeScale }
+                        ? { 
+                            x: offsetXDI, 
+                            opacity: 1, 
+                            scale: mergeScale,
+                            ...glowAnimationCyan 
+                          }
                         : { x: 0, opacity: 1, scale: 1 }
                     }
-                    transition={{ 
-                      type: "tween",
-                      duration: 0.5,
-                      ease: [0.165, 0.84, 0.44, 1]
-                    }}
-                    className="text-center"
+                    transition={
+                      stage >= 3
+                        ? {
+                            x: { type: "tween", duration: 0.5, ease: [0.165, 0.84, 0.44, 1] },
+                            opacity: { type: "tween", duration: 0.5, ease: [0.165, 0.84, 0.44, 1] },
+                            scale: { type: "tween", duration: 0.5, ease: [0.165, 0.84, 0.44, 1] },
+                            filter: { duration: 2, repeat: Infinity, ease: "easeInOut" }
+                          }
+                        : { type: "tween", duration: 0.5, ease: [0.165, 0.84, 0.44, 1] }
+                    }
                     style={{ 
-                      willChange: 'transform, opacity'
+                      willChange: 'transform, opacity',
+                      display: 'inline-block'
                     }}
                   >
-                <motion.div 
-                  className={`text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-2 sm:mb-3 ${
+                <div 
+                  className={`text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold ${
                     stage >= 3
                       ? ""
                       : "text-cyan-600"
                   }`}
-                  style={stage >= 3 ? { color: '#121945' } : {}}
-                  animate={stage >= 3 ? glowAnimationCyan : {}}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
+                  style={
+                    stage >= 3 
+                      ? { 
+                          color: '#121945',
+                          padding: 0,
+                          margin: 0,
+                          lineHeight: 1,
+                          letterSpacing: 0
+                        } 
+                      : {
+                          padding: 0,
+                          margin: 0,
+                          lineHeight: 1,
+                          letterSpacing: 0
+                        }
+                  }
                 >
                   DI
-                </motion.div>
+                </div>
+                {stage < 3 && (
                 <motion.div
-                  animate={stage >= 3 ? { opacity: 0 } : { opacity: 1 }}
+                    initial={{ opacity: 1 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
                   className="text-sm sm:text-base md:text-lg text-cyan-600"
                 >
                   Data Intelligence
                   <div className="text-xs sm:text-sm text-gray-600">데이터 인텔리전스</div>
                 </motion.div>
+                )}
                   </motion.div>
                 )}
               </div>
