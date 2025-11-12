@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
-const ADMIN_PASSWORD = 'veradi2025';
+// 환경 변수에서 관리자 비밀번호 가져오기
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
 export async function POST(request: NextRequest) {
   try {

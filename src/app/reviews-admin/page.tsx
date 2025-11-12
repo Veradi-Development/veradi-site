@@ -1,23 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-
-type Review = {
-  id: string;
-  name: string;
-  school: string;
-  content: string;
-  rating: number;
-  display_order: number;
-  created_at: string;
-  updated_at: string;
-};
-
-const ADMIN_PASSWORD = 'veradi2025';
+import type { Review } from '@/types';
 
 export default function AdminReviewsPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
+  const [adminPassword, setAdminPassword] = useState(''); // 인증 성공 후 저장
   const [error, setError] = useState('');
   
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -32,13 +21,26 @@ export default function AdminReviewsPage() {
     display_order: 0,
   });
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === ADMIN_PASSWORD) {
-      setIsAuthenticated(true);
-      setError('');
-    } else {
-      setError('비밀번호가 올바르지 않습니다');
+    
+    try {
+      const response = await fetch('/api/auth/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+      
+      if (response.ok) {
+        setIsAuthenticated(true);
+        setAdminPassword(password);
+        setError('');
+      } else {
+        setError('비밀번호가 올바르지 않습니다');
+        setPassword('');
+      }
+    } catch {
+      setError('로그인 중 오류가 발생했습니다');
       setPassword('');
     }
   };
@@ -83,7 +85,7 @@ export default function AdminReviewsPage() {
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, password: ADMIN_PASSWORD }),
+        body: JSON.stringify({ ...formData, password: adminPassword }),
       });
 
       if (response.ok) {
@@ -124,7 +126,7 @@ export default function AdminReviewsPage() {
     if (!confirm('정말 삭제하시겠습니까?')) return;
 
     try {
-      const response = await fetch(`/api/reviews/${id}?password=${ADMIN_PASSWORD}`, {
+      const response = await fetch(`/api/reviews/${id}?password=${adminPassword}`, {
         method: 'DELETE',
       });
 

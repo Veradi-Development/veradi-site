@@ -1,48 +1,18 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-
-type PublicationGuide = {
-  id: string;
-  main_title: string;
-  hero_title: string;
-  video_url: string | null;
-  hero_image_url: string | null;
-};
-
-type PublicationSection = {
-  id: string;
-  category: string;
-  title: string;
-  guide_url: string | null;
-  use_subjects_background: boolean;
-  display_order: number;
-};
-
-type PublicationBook = {
-  id: string;
-  title: string;
-  subject: string;
-  category: string | null;
-  main_image_url: string | null;
-  sub_image_url: string | null;
-  purchase_link: string | null;
-  display_order: number;
-};
-
-const ADMIN_PASSWORD = 'veradi2025';
+import type { PublicationGuide, PublicationSection, PublicationBook } from '@/types';
 
 export default function AdminPublicationsPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
+  const [adminPassword, setAdminPassword] = useState(''); // 인증 성공 후 저장
   const [error, setError] = useState('');
   
   const [activeTab, setActiveTab] = useState<'guide' | 'sections' | 'books'>('guide');
   const [loading, setLoading] = useState(true);
 
   // Guide state
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [guide, setGuide] = useState<PublicationGuide | null>(null);
   const [guideForm, setGuideForm] = useState({
     main_title: '',
     hero_title: '',
@@ -77,13 +47,26 @@ export default function AdminPublicationsPage() {
   });
   const [uploadingImage, setUploadingImage] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === ADMIN_PASSWORD) {
-      setIsAuthenticated(true);
-      setError('');
-    } else {
-      setError('비밀번호가 올바르지 않습니다');
+    
+    try {
+      const response = await fetch('/api/auth/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+      
+      if (response.ok) {
+        setIsAuthenticated(true);
+        setAdminPassword(password);
+        setError('');
+      } else {
+        setError('비밀번호가 올바르지 않습니다');
+        setPassword('');
+      }
+    } catch {
+      setError('로그인 중 오류가 발생했습니다');
       setPassword('');
     }
   };
@@ -110,7 +93,6 @@ export default function AdminPublicationsPage() {
       });
       if (response.ok) {
         const data = await response.json();
-        setGuide(data);
         setGuideForm({
           main_title: data.main_title || '',
           hero_title: data.hero_title || '',
@@ -178,7 +160,7 @@ export default function AdminPublicationsPage() {
       const uploadFormData = new FormData();
       uploadFormData.append('file', file);
 
-      const response = await fetch(`/api/upload?password=${encodeURIComponent(ADMIN_PASSWORD)}`, {
+      const response = await fetch(`/api/upload?password=${encodeURIComponent(adminPassword)}`, {
         method: 'POST',
         body: uploadFormData,
       });
@@ -206,7 +188,7 @@ export default function AdminPublicationsPage() {
       const response = await fetch('/api/publication-guide', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...guideForm, password: ADMIN_PASSWORD }),
+        body: JSON.stringify({ ...guideForm, password: adminPassword }),
       });
 
       if (response.ok) {
@@ -232,7 +214,7 @@ export default function AdminPublicationsPage() {
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...sectionForm, password: ADMIN_PASSWORD }),
+        body: JSON.stringify({ ...sectionForm, password: adminPassword }),
       });
 
       if (response.ok) {
@@ -261,7 +243,7 @@ export default function AdminPublicationsPage() {
     if (!confirm('정말 삭제하시겠습니까?')) return;
 
     try {
-      const response = await fetch(`/api/publication-sections/${id}?password=${ADMIN_PASSWORD}`, {
+      const response = await fetch(`/api/publication-sections/${id}?password=${adminPassword}`, {
         method: 'DELETE',
       });
 
@@ -293,7 +275,7 @@ export default function AdminPublicationsPage() {
           title: bookForm.subject, // 제목 = 과목명
           // publications 교재는 type='publication'으로 설정
           type: 'publication',
-          password: ADMIN_PASSWORD,
+          password: adminPassword,
         }),
       });
 
@@ -329,7 +311,7 @@ export default function AdminPublicationsPage() {
       const uploadFormData = new FormData();
       uploadFormData.append('file', file);
 
-      const response = await fetch(`/api/upload?password=${encodeURIComponent(ADMIN_PASSWORD)}`, {
+      const response = await fetch(`/api/upload?password=${encodeURIComponent(adminPassword)}`, {
         method: 'POST',
         body: uploadFormData,
       });
@@ -356,7 +338,7 @@ export default function AdminPublicationsPage() {
     if (!confirm('정말 삭제하시겠습니까?')) return;
 
     try {
-      const response = await fetch(`/api/books/${id}?password=${ADMIN_PASSWORD}`, {
+      const response = await fetch(`/api/books/${id}?password=${adminPassword}`, {
         method: 'DELETE',
       });
 

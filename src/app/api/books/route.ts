@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
-const ADMIN_PASSWORD = 'veradi2025';
+// 환경 변수에서 관리자 비밀번호 가져오기
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
-// 캐시 설정: 5분 (300초)
-export const revalidate = 300;
+// 캐시 설정: 12시간 (43200초)
+export const revalidate = 43200;
 
 // GET: 모든 교재 가져오기
 export async function GET(request: NextRequest) {
@@ -30,7 +31,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(data || [], {
       headers: {
-        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+        'Cache-Control': 'public, s-maxage=43200, stale-while-revalidate=86400',
       },
     });
   } catch (error) {

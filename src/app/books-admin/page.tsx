@@ -1,28 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-
-type Book = {
-  id: string;
-  title: string;
-  subject: string;
-  description: string | null;
-  type: 'grid' | 'grid2' | 'subject';
-  main_image_url: string | null;
-  sub_image_url: string | null;
-  front_image_url: string | null;
-  purchase_link: string | null;
-  price: string | null;
-  display_order: number;
-  created_at: string;
-  updated_at: string;
-};
-
-const ADMIN_PASSWORD = 'veradi2025';
+import type { Book } from '@/types';
 
 export default function AdminBooksPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
+  const [adminPassword, setAdminPassword] = useState(''); // 인증 성공 후 저장
   const [error, setError] = useState('');
   
   const [activeTab, setActiveTab] = useState<'grid' | 'grid2' | 'subject'>('grid');
@@ -34,7 +18,7 @@ export default function AdminBooksPage() {
     subject: '',
     title: '',
     description: '',
-    type: 'grid' as 'grid' | 'grid2' | 'subject',
+    type: 'grid' as 'grid' | 'grid2' | 'subject' | 'publication',
     main_image_url: '',
     sub_image_url: '',
     front_image_url: '',
@@ -44,13 +28,26 @@ export default function AdminBooksPage() {
   });
   const [uploading, setUploading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === ADMIN_PASSWORD) {
-      setIsAuthenticated(true);
-      setError('');
-    } else {
-      setError('비밀번호가 올바르지 않습니다');
+    
+    try {
+      const response = await fetch('/api/auth/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+      
+      if (response.ok) {
+        setIsAuthenticated(true);
+        setAdminPassword(password); // 인증 성공 시 비밀번호 저장
+        setError('');
+      } else {
+        setError('비밀번호가 올바르지 않습니다');
+        setPassword('');
+      }
+    } catch {
+      setError('로그인 중 오류가 발생했습니다');
       setPassword('');
     }
   };
@@ -98,7 +95,7 @@ export default function AdminBooksPage() {
         body: JSON.stringify({ 
           ...formData, 
           title: (formData.type === 'grid' || formData.type === 'grid2') ? formData.subject : formData.title, // GRID는 과목명, Subjects는 팀 이름
-          password: ADMIN_PASSWORD 
+          password: adminPassword 
         }),
       });
 
@@ -155,7 +152,7 @@ export default function AdminBooksPage() {
       const uploadFormData = new FormData();
       uploadFormData.append('file', file);
 
-      const response = await fetch(`/api/upload?password=${encodeURIComponent(ADMIN_PASSWORD)}`, {
+      const response = await fetch(`/api/upload?password=${encodeURIComponent(adminPassword)}`, {
         method: 'POST',
         body: uploadFormData,
       });
@@ -190,7 +187,7 @@ export default function AdminBooksPage() {
     if (!confirm('정말 삭제하시겠습니까?')) return;
 
     try {
-      const response = await fetch(`/api/books/${id}?password=${ADMIN_PASSWORD}`, {
+      const response = await fetch(`/api/books/${id}?password=${adminPassword}`, {
         method: 'DELETE',
       });
 

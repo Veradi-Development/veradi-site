@@ -6,11 +6,10 @@ import dynamic from 'next/dynamic';
 
 const RichTextEditor = dynamic(() => import('@/components/RichTextEditor'), { ssr: false });
 
-const ADMIN_PASSWORD = 'veradi2025';
-
 export default function AdminAnnouncementsPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
+  const [adminPassword, setAdminPassword] = useState(''); // 인증 성공 후 저장
   const [error, setError] = useState('');
   
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
@@ -25,13 +24,26 @@ export default function AdminAnnouncementsPage() {
   const [uploading, setUploading] = useState(false);
   const [attachments, setAttachments] = useState<Array<{ name: string; url: string; size: number; type: string }>>([]); // 별도 파일 목록 상태
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === ADMIN_PASSWORD) {
-      setIsAuthenticated(true);
-      setError('');
-    } else {
-      setError('비밀번호가 올바르지 않습니다');
+    
+    try {
+      const response = await fetch('/api/auth/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+      
+      if (response.ok) {
+        setIsAuthenticated(true);
+        setAdminPassword(password);
+        setError('');
+      } else {
+        setError('비밀번호가 올바르지 않습니다');
+        setPassword('');
+      }
+    } catch {
+      setError('로그인 중 오류가 발생했습니다');
       setPassword('');
     }
   };
@@ -86,7 +98,7 @@ export default function AdminAnnouncementsPage() {
         },
         body: JSON.stringify({
           ...formData,
-          password: ADMIN_PASSWORD,
+          password: adminPassword,
         }),
       });
 
@@ -132,7 +144,7 @@ export default function AdminAnnouncementsPage() {
         const uploadFormData = new FormData();
         uploadFormData.append('file', file);
         
-        const response = await fetch(`/api/upload?password=${encodeURIComponent(ADMIN_PASSWORD)}`, {
+        const response = await fetch(`/api/upload?password=${encodeURIComponent(adminPassword)}`, {
           method: 'POST',
           body: uploadFormData,
         });
@@ -177,7 +189,7 @@ export default function AdminAnnouncementsPage() {
     const uploadFormData = new FormData();
     uploadFormData.append('file', file);
 
-    const response = await fetch(`/api/upload?password=${encodeURIComponent(ADMIN_PASSWORD)}`, {
+    const response = await fetch(`/api/upload?password=${encodeURIComponent(adminPassword)}`, {
       method: 'POST',
       body: uploadFormData,
     });
@@ -201,7 +213,7 @@ export default function AdminAnnouncementsPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ password: ADMIN_PASSWORD }),
+        body: JSON.stringify({ password: adminPassword }),
       });
 
       if (!response.ok) {
