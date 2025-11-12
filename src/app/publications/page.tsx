@@ -100,14 +100,18 @@ function BookSeriesSection({
       )}
       
       {/* 레이아웃: 크림 배경은 세로, 그리드 배경은 좌우 */}
-      <div className={`pb-20 md:pb-[120px] ${
+      <div className={`${
+        useSubjectsBackground 
+          ? 'pb-24 md:pb-32 lg:pb-[120px]' // 크림: 하단 여백 더 많이
+          : 'pb-20 md:pb-[120px]' // 그리드: 기존 유지
+      } ${
         isFirstSection 
           ? 'pt-32 sm:pt-36 md:pt-40 lg:pt-28' // 첫 번째 섹션: md 이하에서 간격 더 넓게
           : 'pt-12 sm:pt-16 md:pt-20 lg:pt-28' // 나머지 섹션: md 이하에서 간격 좁게
       } ${useSubjectsBackground ? '' : 'pl-6 lg:pl-0'}`}>
         <div className={`flex flex-col ${
           useSubjectsBackground 
-            ? 'gap-4 sm:gap-6 md:gap-8 md:flex-col px-4 sm:px-6 md:px-8 lg:px-12' // 크림: md 이하에서 넓게
+            ? 'gap-1 sm:gap-2 md:gap-3 md:flex-col px-4 sm:px-6 md:px-8 lg:px-12' // 크림: md 이하에서 매우 좁게
             : 'gap-4 sm:gap-4 md:gap-4 lg:gap-8 lg:flex-row lg:items-start lg:pl-[60px] lg:pr-0 lg:ml-[30px]' // 그리드: md 이하에서 좁게
         }`}>
           {/* 텍스트 카드 */}
@@ -161,7 +165,7 @@ function BookSeriesSection({
               whileInView={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px", amount: 0.2 }}
               transition={{ duration: isMobile ? 0 : 0.5, ease: "easeOut" }}
-              className="w-full grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 md:gap-20 lg:gap-24 mt-2 sm:mt-4 md:mt-6 lg:mt-8"
+              className="w-full grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 md:gap-20 lg:gap-24 mt-0 sm:mt-1 md:mt-2 lg:mt-8"
             >
           {books.map((book, idx) => (
             <motion.div
@@ -234,7 +238,7 @@ function BookSeriesSection({
             </motion.div>
           ) : (
             // 그리드 배경: 슬라이드 레이아웃
-            <div className="relative overflow-visible flex-1 mt-4 sm:mt-4 md:mt-4 lg:mt-0 lg:ml-[30px]" style={{ 
+            <div className="relative overflow-visible flex-1 mt-12 sm:mt-10 md:mt-10 lg:mt-0 lg:ml-[30px]" style={{ 
               minWidth: '0',
               marginLeft: '0',
               marginRight: '0'
