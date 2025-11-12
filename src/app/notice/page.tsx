@@ -44,8 +44,8 @@ const AnnouncementItem = memo(({
         href={`/notice/${announcement.id}`}
         className="block border-b border-gray-200 hover:bg-gray-50 transition-colors duration-200"
       >
-        {/* 데스크톱 레이아웃 */}
-        <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-5">
+        {/* 테이블 레이아웃 - sm 이상 */}
+        <div className="hidden sm:grid grid-cols-12 gap-4 px-6 py-5">
           <div className="col-span-1 text-center text-gray-600">
             {total - index}
           </div>
@@ -60,23 +60,18 @@ const AnnouncementItem = memo(({
           </div>
         </div>
 
-        {/* 모바일 레이아웃 */}
-        <div className="md:hidden px-4 py-4">
-          <div className="flex items-start gap-3">
-            <div className="flex-shrink-0 w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-sm font-semibold text-gray-600">
-              {total - index}
-            </div>
-            <div className="flex-1 min-w-0">
-              <h3 className="text-black font-medium mb-1 hover:text-blue-600 flex items-center gap-2">
-                {announcement.title}
-                {announcement.attachments && announcement.attachments.length > 0 && (
-                  <span className="text-xs text-gray-500">📎 {announcement.attachments.length}</span>
-                )}
-              </h3>
-              <p className="text-xs text-gray-500">
-                {formatDate(announcement.created_at)}
-              </p>
-            </div>
+        {/* 모바일 레이아웃 - sm 미만 */}
+        <div className="sm:hidden px-4 py-4">
+          <div className="flex flex-col">
+            <h3 className="text-black font-medium mb-1 hover:text-blue-600 flex items-center gap-2">
+              {announcement.title}
+              {announcement.attachments && announcement.attachments.length > 0 && (
+                <span className="text-xs text-gray-500">📎 {announcement.attachments.length}</span>
+              )}
+            </h3>
+            <p className="text-xs text-gray-500">
+              {formatDate(announcement.created_at)}
+            </p>
           </div>
         </div>
       </Link>
@@ -146,8 +141,7 @@ export default function NoticePage() {
           transition={{ duration: isMobile ? 0 : 0.5, ease: "easeOut" }}
           className="mb-12 text-center"
         >
-          <h1 className="text-3xl font-extrabold text-black mb-2">공지사항</h1>
-          <p className="text-gray-600">VERADI의 최신 소식을 확인하세요</p>
+          <h1 className="text-3xl font-extrabold text-black">공지사항</h1>
         </motion.div>
 
         {/* 공지사항 테이블 */}
@@ -157,6 +151,19 @@ export default function NoticePage() {
           transition={{ duration: isMobile ? 0 : 0.5, delay: isMobile ? 0 : 0.1, ease: "easeOut" }}
           className="bg-white border-t-2 border-gray-800"
         >
+          {/* 테이블 헤더 - sm 이상에서 표시 */}
+          <div className="hidden sm:grid grid-cols-12 gap-4 px-6 py-4 bg-gray-50 border-b border-gray-200">
+            <div className="col-span-1 text-center text-sm font-semibold text-gray-700">
+              번호
+            </div>
+            <div className="col-span-9 text-center text-sm font-semibold text-gray-700">
+              제목
+            </div>
+            <div className="col-span-2 text-center text-sm font-semibold text-gray-700">
+              날짜
+            </div>
+          </div>
+
           {/* 테이블 내용 */}
           {announcements.length === 0 ? (
             <div className="text-center py-16 text-gray-500">
@@ -189,13 +196,13 @@ export default function NoticePage() {
             <button
               onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
-              className={`p-1.5 rounded transition-colors ${
+              className={`w-9 h-9 flex items-center justify-center rounded transition-colors ${
                 currentPage === 1
                   ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                   : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
               }`}
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-5 h-5" />
             </button>
 
             {/* 페이지 번호 */}
@@ -203,9 +210,9 @@ export default function NoticePage() {
               <button
                 key={page}
                 onClick={() => setCurrentPage(page)}
-                className={`px-3 py-1.5 text-sm rounded transition-colors ${
+                className={`w-9 h-9 flex items-center justify-center text-base font-medium rounded transition-colors ${
                   currentPage === page
-                    ? 'bg-gray-700 text-white'
+                    ? 'bg-gray-500 text-white'
                     : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
                 }`}
               >
@@ -217,13 +224,13 @@ export default function NoticePage() {
             <button
               onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
               disabled={currentPage === totalPages}
-              className={`p-1.5 rounded transition-colors ${
+              className={`w-9 h-9 flex items-center justify-center rounded transition-colors ${
                 currentPage === totalPages
                   ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                   : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
               }`}
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-5 h-5" />
             </button>
           </motion.div>
         )}

@@ -31,9 +31,24 @@ export default function QnAPage() {
                   href="http://pf.kakao.com/_xdHxixj"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex flex-col items-center gap-4 p-6 bg-yellow-50 border border-yellow-200 rounded-lg hover:bg-yellow-100 transition-colors cursor-pointer"
+                  className="flex flex-col items-center gap-4 p-6 bg-yellow-50 border border-yellow-200 rounded-lg hover:bg-yellow-100 transition-colors cursor-pointer group"
                 >
-                  <div className="text-6xl">💬</div>
+                  {/* 카카오톡 로고 */}
+                  <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow" style={{ backgroundColor: '#FEE500' }}>
+                    {/* 말풍선 SVG */}
+                    <div className="relative">
+                      <svg width="56" height="50" viewBox="0 0 48 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        {/* 말풍선 */}
+                        <path d="M24 4C13.5 4 5 10.5 5 18.5C5 23.5 8.5 27.8 13.5 30.2C13 32 12 35.5 11.8 36.2C11.6 37 12 37 12.5 36.6C12.9 36.3 17 33.5 18.5 32.3C20.5 32.8 22.2 33 24 33C34.5 33 43 26 43 18C43 10 34.5 4 24 4Z" fill="#3C1E1E"/>
+                      </svg>
+                      {/* TALK 텍스트 */}
+                      <div className="absolute inset-0 flex items-center justify-center" style={{ marginTop: '-4px' }}>
+                        <span className="text-sm font-bold" style={{ color: '#FEE500', letterSpacing: '0.5px' }}>
+                          TALK
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                   <div className="text-center">
                     <div className="text-sm font-semibold text-gray-700 mb-1">KakaoTalk</div>
                     <div className="text-lg font-bold text-gray-900">VERADI</div>

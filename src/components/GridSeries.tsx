@@ -193,15 +193,15 @@ export default function GridSeries() {
   }, [subjects, recheckScroll]);
 
   return (
-    <div className="pl-6 md:pl-0 pb-20 md:pb-[120px]">
-      <div className="flex flex-col md:flex-row gap-8 md:items-start md:pl-[60px] md:pr-[40px] md:ml-[30px]">
+    <div className="pl-6 lg:pl-0 pb-20 md:pb-[120px]">
+      <div className="flex flex-col lg:flex-row gap-8 lg:items-start lg:pl-[60px] lg:pr-[40px] lg:ml-[30px]">
         {/* 텍스트 카드 */}
         <motion.div
           initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 30 }}
           whileInView={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px", amount: 0.2 }}
           transition={{ duration: isMobile ? 0 : 0.6, ease: "easeOut" }}
-          className="flex-shrink-0 w-full md:w-[360px] md:-ml-[30px]"
+          className="flex-shrink-0 w-full lg:w-[360px] lg:-ml-[30px]"
           style={{ marginBottom: "0" }}
         >
           <div className="text-left">
@@ -225,7 +225,7 @@ export default function GridSeries() {
         </motion.div>
 
         {/* 슬라이드 영역 */}
-        <div className="relative overflow-visible flex-1 mt-4 md:mt-0 md:ml-[30px]" style={{ 
+        <div className="relative overflow-visible flex-1 mt-8 lg:mt-0 lg:ml-[30px]" style={{ 
           minWidth: '0',
           marginLeft: '0',
           marginRight: '0'
@@ -235,7 +235,7 @@ export default function GridSeries() {
             <button
               onClick={() => scroll("left")}
               disabled={!canScrollLeft}
-              className={`hidden md:block absolute p-2 sm:p-3 rounded-full shadow-md backdrop-blur-sm transition-all duration-300 z-20 ${
+              className={`hidden lg:block absolute p-2 sm:p-3 rounded-full shadow-md backdrop-blur-sm transition-all duration-300 z-20 ${
                 canScrollLeft
                   ? "bg-white/80 hover:bg-white hover:shadow-xl hover:scale-110 cursor-pointer"
                   : "bg-white/30 opacity-40 cursor-not-allowed"
@@ -254,7 +254,7 @@ export default function GridSeries() {
             <button
               onClick={() => scroll("right")}
               disabled={!canScrollRight}
-              className={`hidden md:block absolute p-2 sm:p-3 rounded-full shadow-md backdrop-blur-sm transition-all duration-300 z-20 ${
+              className={`hidden lg:block absolute p-2 sm:p-3 rounded-full shadow-md backdrop-blur-sm transition-all duration-300 z-20 ${
                 canScrollRight
                   ? "bg-white/80 hover:bg-white hover:shadow-xl hover:scale-110 cursor-pointer"
                   : "bg-white/30 opacity-40 cursor-not-allowed"

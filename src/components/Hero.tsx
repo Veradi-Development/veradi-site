@@ -25,9 +25,9 @@ export default function Hero() {
           transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
           className="mb-4 sm:mb-5 md:mb-6"
         >
-          <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-pink-400 to-blue-400 bg-clip-text text-transparent leading-tight" style={{ filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3))' }}>
-            1% 로직을
-            <br className="sm:hidden" />
+          <h1 className="text-4xl sm:text-5xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-pink-400 to-blue-400 bg-clip-text text-transparent leading-tight" style={{ filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3))' }}>
+            1%로직을
+            <br className="md:hidden" />
             {' '}당신의 것으로.
           </h1>
         </motion.div>
@@ -37,7 +37,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 100 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.5, ease: "easeOut" }}
-          className="text-base sm:text-lg md:text-xl lg:text-3xl font-semibold text-white drop-shadow-lg leading-tight px-2 sm:px-0"
+          className="text-base sm:text-xl md:text-xl lg:text-3xl font-semibold text-white drop-shadow-lg leading-tight px-2 sm:px-0"
         >
           고등 · 수능 zero to mastery
         </motion.p>

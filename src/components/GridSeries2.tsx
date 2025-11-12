@@ -193,10 +193,10 @@ export default function GridSeries2() {
   }, [subjects, recheckScroll]);
 
   return (
-    <div className="pl-6 md:pl-0 pt-6 md:pt-[87px]">
-      <div className="flex flex-col-reverse md:flex-row gap-8 md:items-start md:pl-[60px] md:pr-0 md:gap-[32px]">
+    <div className="pl-6 lg:pl-0 pt-6 md:pt-[87px]">
+      <div className="flex flex-col-reverse lg:flex-row gap-8 lg:items-start lg:pl-[60px] lg:pr-0 lg:gap-[32px]">
         {/* 슬라이드 영역 */}
-        <div className="relative overflow-visible flex-1 mt-4 md:mt-0" style={{ 
+        <div className="relative overflow-visible flex-1 mt-4 lg:mt-0" style={{ 
           minWidth: '0'
         }}>
             {/* 화살표 버튼 */}
@@ -204,7 +204,7 @@ export default function GridSeries2() {
             <button
               onClick={() => scroll("left")}
               disabled={!canScrollLeft}
-              className={`hidden md:block absolute p-2 sm:p-3 rounded-full shadow-md backdrop-blur-sm transition-all duration-300 z-20 ${
+              className={`hidden lg:block absolute p-2 sm:p-3 rounded-full shadow-md backdrop-blur-sm transition-all duration-300 z-20 ${
                 canScrollLeft
                   ? "bg-white/80 hover:bg-white hover:shadow-xl hover:scale-110 cursor-pointer"
                   : "bg-white/30 opacity-40 cursor-not-allowed"
@@ -223,7 +223,7 @@ export default function GridSeries2() {
             <button
               onClick={() => scroll("right")}
               disabled={!canScrollRight}
-              className={`hidden md:block absolute p-2 sm:p-3 rounded-full shadow-md backdrop-blur-sm transition-all duration-300 z-20 ${
+              className={`hidden lg:block absolute p-2 sm:p-3 rounded-full shadow-md backdrop-blur-sm transition-all duration-300 z-20 ${
                 canScrollRight
                   ? "bg-white/80 hover:bg-white hover:shadow-xl hover:scale-110 cursor-pointer"
                   : "bg-white/30 opacity-40 cursor-not-allowed"
@@ -280,7 +280,7 @@ export default function GridSeries2() {
           whileInView={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px", amount: 0.2 }}
           transition={{ duration: isMobile ? 0 : 0.6, ease: "easeOut" }}
-          className="flex-shrink-0 w-full md:w-[360px] md:ml-[77px]"
+          className="flex-shrink-0 w-full lg:w-[360px] lg:ml-[77px]"
         >
           <div className="text-left">
             <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-4 leading-[1.1]">

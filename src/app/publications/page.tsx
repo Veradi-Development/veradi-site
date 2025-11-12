@@ -47,12 +47,14 @@ function BookSeriesSection({
   title,
   books,
   guideUrl,
-  useSubjectsBackground = false
+  useSubjectsBackground = false,
+  isFirstSection = false
 }: {
   title: string;
   books: BookData[];
   guideUrl?: string | null;
   useSubjectsBackground?: boolean;
+  isFirstSection?: boolean;
 }) {
   const isMobile = useMobileDetect();
   const { scrollRef, canScrollLeft, canScrollRight, scroll, recheckScroll } = useHorizontalScroll({
@@ -98,13 +100,15 @@ function BookSeriesSection({
       )}
       
       {/* 레이아웃: 크림 배경은 세로, 그리드 배경은 좌우 */}
-      <div className={`pb-20 md:pb-[120px] pt-16 sm:pt-20 md:pt-24 lg:pt-28 ${
-        useSubjectsBackground ? '' : 'pl-6 md:pl-0' // 그리드만 왼쪽 패딩
-      }`}>
-        <div className={`flex flex-col gap-8 ${
+      <div className={`pb-20 md:pb-[120px] ${
+        isFirstSection 
+          ? 'pt-32 sm:pt-36 md:pt-40 lg:pt-28' // 첫 번째 섹션: md 이하에서 간격 더 넓게
+          : 'pt-12 sm:pt-16 md:pt-20 lg:pt-28' // 나머지 섹션: md 이하에서 간격 좁게
+      } ${useSubjectsBackground ? '' : 'pl-6 lg:pl-0'}`}>
+        <div className={`flex flex-col ${
           useSubjectsBackground 
-            ? 'md:flex-col px-4 sm:px-6 md:px-8 lg:px-12' // 크림: 세로 배치, 적절한 패딩
-            : 'md:flex-row md:items-start md:pl-[60px] md:pr-0 md:ml-[30px]' // 그리드: 좌우 배치
+            ? 'gap-4 sm:gap-6 md:gap-8 md:flex-col px-4 sm:px-6 md:px-8 lg:px-12' // 크림: md 이하에서 넓게
+            : 'gap-4 sm:gap-4 md:gap-4 lg:gap-8 lg:flex-row lg:items-start lg:pl-[60px] lg:pr-0 lg:ml-[30px]' // 그리드: md 이하에서 좁게
         }`}>
           {/* 텍스트 카드 */}
         <motion.div
@@ -115,15 +119,15 @@ function BookSeriesSection({
             className={`flex-shrink-0 w-full ${
               useSubjectsBackground 
                 ? '' // 크림: 전체 너비
-                : 'md:w-[360px] md:-ml-[60px]' // 그리드: 고정 너비 + 왼쪽으로
+                : 'lg:w-[360px] lg:-ml-[60px]' // 그리드: 고정 너비 + 왼쪽으로
             }`}
             style={{ marginBottom: "0" }}
         >
-            <div className="flex flex-row md:flex-col items-center md:items-start justify-between md:justify-start gap-4">
+            <div className="flex flex-row lg:flex-col items-center lg:items-start justify-between lg:justify-start gap-4">
               <h2 className={`font-bold tracking-tight leading-[1.1] ${
                 useSubjectsBackground 
-                  ? 'text-gray-900 text-3xl md:text-4xl lg:text-5xl' // 크림: 그리드와 같은 크기
-                  : 'text-white text-3xl md:text-[42px] lg:text-[45px]' // 그리드: 모바일 작게
+                  ? 'text-gray-900 text-2xl sm:text-3xl md:text-4xl lg:text-5xl' // 크림: 400px 이하에서 작게
+                  : 'text-white text-2xl sm:text-3xl md:text-4xl lg:text-[45px]' // 그리드: 400px 이하에서 작게
               }`}>
             {title}
           </h2>
@@ -157,7 +161,7 @@ function BookSeriesSection({
               whileInView={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px", amount: 0.2 }}
               transition={{ duration: isMobile ? 0 : 0.5, ease: "easeOut" }}
-              className="w-full grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 md:gap-20 lg:gap-24 mt-0 md:mt-8"
+              className="w-full grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 md:gap-20 lg:gap-24 mt-2 sm:mt-4 md:mt-6 lg:mt-8"
             >
           {books.map((book, idx) => (
             <motion.div
@@ -230,7 +234,7 @@ function BookSeriesSection({
             </motion.div>
           ) : (
             // 그리드 배경: 슬라이드 레이아웃
-            <div className="relative overflow-visible flex-1 mt-8 md:mt-0 md:ml-[30px]" style={{ 
+            <div className="relative overflow-visible flex-1 mt-4 sm:mt-4 md:mt-4 lg:mt-0 lg:ml-[30px]" style={{ 
               minWidth: '0',
               marginLeft: '0',
               marginRight: '0'
@@ -241,7 +245,7 @@ function BookSeriesSection({
                   <button
                     onClick={() => scroll("left")}
                     disabled={!canScrollLeft}
-                    className={`hidden md:block absolute p-2 sm:p-3 rounded-full shadow-md backdrop-blur-sm transition-all duration-300 z-20 ${
+                    className={`hidden lg:block absolute p-2 sm:p-3 rounded-full shadow-md backdrop-blur-sm transition-all duration-300 z-20 ${
                       canScrollLeft
                         ? "bg-white/80 hover:bg-white hover:shadow-xl hover:scale-110 cursor-pointer"
                         : "bg-white/30 opacity-40 cursor-not-allowed"
@@ -259,7 +263,7 @@ function BookSeriesSection({
                   <button
                     onClick={() => scroll("right")}
                     disabled={!canScrollRight}
-                    className={`hidden md:block absolute p-2 sm:p-3 rounded-full shadow-md backdrop-blur-sm transition-all duration-300 z-20 ${
+                    className={`hidden lg:block absolute p-2 sm:p-3 rounded-full shadow-md backdrop-blur-sm transition-all duration-300 z-20 ${
                       canScrollRight
                         ? "bg-white/80 hover:bg-white hover:shadow-xl hover:scale-110 cursor-pointer"
                         : "bg-white/30 opacity-40 cursor-not-allowed"
@@ -530,14 +534,14 @@ export default function Publications() {
       <Navbar />
       
       {/* Apple 스타일 히어로 섹션 - 완벽활용가이드 */}
-      <section id="guide-section" className="pt-24 px-4 sm:px-6 md:px-4 lg:px-6 bg-gradient-to-b from-gray-50 to-white md:min-h-screen md:flex md:items-center md:pt-0">
-        <div className="max-w-[1400px] mx-auto w-full py-0 md:py-0">
+      <section id="guide-section" className="pt-24 px-4 sm:px-6 md:px-4 lg:px-6 bg-gradient-to-b from-gray-50 to-white lg:min-h-screen lg:flex lg:items-center lg:pt-0">
+        <div className="max-w-[1400px] mx-auto w-full py-0 lg:py-0">
           {/* 제목 */}
           <motion.div
             initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 30 }}
             animate={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
             transition={{ duration: isMobile ? 0 : 0.5 }}
-            className="text-left mb-8 sm:mb-12 md:mb-2 lg:mb-3"
+            className="text-left mb-8 sm:mb-12 md:mb-8 lg:mb-2"
           >
             <h1 className="text-3xl sm:text-4xl md:text-3xl lg:text-4xl font-bold text-gray-900 tracking-tight leading-tight">
               {guide?.main_title || '완벽활용가이드'}
@@ -549,10 +553,10 @@ export default function Publications() {
             initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 30 }}
             animate={isMobile ? { opacity: 1 } : { opacity: 1, y: 0 }}
             transition={{ duration: isMobile ? 0 : 0.5, delay: isMobile ? 0 : 0.1 }}
-            className="relative rounded-3xl overflow-hidden shadow-2xl mb-16 sm:mb-24 md:mb-0"
+            className="relative rounded-3xl overflow-hidden shadow-2xl mb-16 sm:mb-24 md:mb-16 lg:mb-0"
           >
             {/* 배경 이미지 - 책 들고 있는 사람 */}
-            <div className="relative w-full h-[300px] sm:h-[400px] md:h-[70vh] lg:h-[72vh]">
+            <div className="relative w-full h-[300px] sm:h-[400px] md:h-[500px] lg:h-[70vh]">
               {guide?.hero_image_url ? (
                 <Image 
                   src={guide.hero_image_url} 
@@ -611,13 +615,14 @@ export default function Publications() {
       </section>
 
       {/* 각 교재 시리즈 섹션 - 동적으로 생성 */}
-      {sections.map((section) => (
+      {sections.map((section, index) => (
         <BookSeriesSection
           key={section.category}
           title={section.title}
           books={booksByCategory[section.category] || []}
           guideUrl={section.guide_url}
           useSubjectsBackground={section.use_subjects_background}
+          isFirstSection={index === 0}
         />
       ))}
 
