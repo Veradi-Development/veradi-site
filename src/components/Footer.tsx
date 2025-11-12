@@ -3,7 +3,7 @@
 export default function Footer() {
   return (
     <footer className="bg-gray-200 text-gray-700 py-12">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
+      <div className="max-w-6xl px-4 sm:px-6 md:px-8 lg:px-12">
         <div className="text-2xl font-bold text-gray-900 mb-6 text-left">VERADI</div>
         
         {/* 회사 정보 */}
