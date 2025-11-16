@@ -38,28 +38,30 @@ export default function ValueProposition() {
 
       // VERA는 4글자, DI는 2글자
       // 합치면 VERADI = 6글자
-      // 중앙은 A와 D 사이 = VERA의 3/4 지점
+      // 중앙은 A와 D 사이 = VERA의 기준 지점
+      // - 기본: 70%
+      // - 화면이 lg 이상(>=1024px): 65%
       
       const veraWidth = veraRect.width;
-      const diWidth = diRect.width;
       
       // 컨테이너 중심
       const containerCenter = containerRect.left + containerRect.width / 2;
       
-      // VERA의 3/4 지점 (대략 A의 끝)
-      const veraThreeQuarterPoint = veraRect.left + (veraWidth * 3 / 4);
-      
       // 화면 크기에 따른 동적 보정 (scale 1.4 적용 버전)
       // text-4xl (<640) / sm:text-5xl (640-767) / md:text-6xl (768-1023) / lg:text-7xl (1024+)
       const screenWidth = window.innerWidth;
-      let correction = -7; // 기본값 (< 640px, text-4xl) - 25.76px 겹침 보정
+      let correction = -9; // 기본값 (< 640px, text-4xl) - 25.76px 겹침 보정
+      
+      // 화면 크기에 따른 앵커 비율
+      const veraAnchorRatio = screenWidth >= 1024 ? (6 / 10) : (7 / 10); // 65% or 70%
+      const veraThreeQuarterPoint = veraRect.left + (veraWidth * veraAnchorRatio);
       
       if (screenWidth >= 1024) {
-        correction = -34; // lg: text-7xl - 27.67px 겹침 보정
+        correction = -46; // lg: text-7xl - 27.67px 겹침 보정
       } else if (screenWidth >= 768) {
-        correction = -22; // md: text-6xl - 미세 조정 (5px 간격 보정)
+        correction = -25; // md: text-6xl - 미세 조정 (5px 간격 보정)
       } else if (screenWidth >= 640) {
-        correction = -15; // sm: text-5xl - 9.85px 겹침 보정
+        correction = -17; // sm: text-5xl - 9.85px 겹침 보정
       }
       
       const veraOffset = containerCenter - veraThreeQuarterPoint + correction;

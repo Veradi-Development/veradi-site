@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, ShoppingCart, Play } from "lucide-react";
+import { ArrowLeft, ArrowRight, Play } from "lucide-react";
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -11,7 +11,6 @@ import { useMobileDetect } from "@/hooks/useMobileDetect";
 
 // 상수 정의
 const SCROLL_AMOUNT_RATIO = 0.8;
-const CARD_HOVER_SCALE = 1.03;
 const optimizedStyle = {
   willChange: 'transform' as const,
   backfaceVisibility: 'hidden' as const

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import type { PublicationGuide, PublicationSection, PublicationBook } from '@/types';
+import type { PublicationSection, PublicationBook } from '@/types';
 
 export default function AdminPublicationsPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
