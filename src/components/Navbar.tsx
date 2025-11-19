@@ -7,6 +7,7 @@ import { useState, useEffect, useCallback, memo } from "react";
 
 const Navbar = memo(function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  // 하이드레이션 불일치 방지를 위해 초기값을 고정
   const [navState, setNavState] = useState<'dark' | 'light-transparent' | 'solid'>('dark');
   const pathname = usePathname();
 
@@ -18,6 +19,8 @@ const Navbar = memo(function Navbar() {
   ];
 
   const handleScroll = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    
     const scrollY = window.scrollY;
     const heroHeight = window.innerHeight;
     const isMobile = window.innerWidth < 768;
@@ -34,9 +37,19 @@ const Navbar = memo(function Navbar() {
   }, []);
 
   useEffect(() => {
-    handleScroll(); // 초기 실행
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    // 하이드레이션 완료 후 실행하여 불일치 방지
+    if (typeof window !== 'undefined') {
+      // 하이드레이션이 완전히 완료된 후 상태 업데이트 (약간의 지연)
+      const timer = setTimeout(() => {
+        handleScroll();
+      }, 100);
+      
+      window.addEventListener('scroll', handleScroll, { passive: true });
+      return () => {
+        clearTimeout(timer);
+        window.removeEventListener('scroll', handleScroll);
+      };
+    }
   }, [handleScroll]);
 
   const isHomePage = pathname === '/';

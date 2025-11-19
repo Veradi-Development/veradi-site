@@ -31,6 +31,7 @@ export default function ValueProposition() {
     // 가장 간단하게: 간격을 반으로 나눠서 서로 다가가기
     const updateOffset = () => {
       if (!veraRef.current || !diRef.current || !containerRef.current) return;
+      if (typeof window === 'undefined') return;
 
       const veraRect = veraRef.current.getBoundingClientRect();
       const diRect = diRef.current.getBoundingClientRect();
@@ -50,18 +51,18 @@ export default function ValueProposition() {
       // 화면 크기에 따른 동적 보정 (scale 1.4 적용 버전)
       // text-4xl (<640) / sm:text-5xl (640-767) / md:text-6xl (768-1023) / lg:text-7xl (1024+)
       const screenWidth = window.innerWidth;
-      let correction = -9; // 기본값 (< 640px, text-4xl) - 25.76px 겹침 보정
+      let correction = -10.5; // 기본값 (< 640px, text-4xl) - 25.76px 겹침 보정
       
       // 화면 크기에 따른 앵커 비율
       const veraAnchorRatio = screenWidth >= 1024 ? (6 / 10) : (7 / 10); // 65% or 70%
       const veraThreeQuarterPoint = veraRect.left + (veraWidth * veraAnchorRatio);
       
       if (screenWidth >= 1024) {
-        correction = -46; // lg: text-7xl - 27.67px 겹침 보정
+        correction = -49; // lg: text-7xl - 27.67px 겹침 보정
       } else if (screenWidth >= 768) {
-        correction = -25; // md: text-6xl - 미세 조정 (5px 간격 보정)
+        correction = -28; // md: text-6xl - 미세 조정 (5px 간격 보정)
       } else if (screenWidth >= 640) {
-        correction = -17; // sm: text-5xl - 9.85px 겹침 보정
+        correction = -19; // sm: text-5xl - 9.85px 겹침 보정
       }
       
       const veraOffset = containerCenter - veraThreeQuarterPoint + correction;
@@ -75,7 +76,7 @@ export default function ValueProposition() {
     const initialTimer = setTimeout(updateOffset, 1200);
     
     // 폰트 로딩 완료 후 재계산
-    if (document.fonts && document.fonts.ready) {
+    if (typeof document !== 'undefined' && document.fonts && document.fonts.ready) {
       document.fonts.ready.then(() => {
         setTimeout(updateOffset, 1200);
       });
