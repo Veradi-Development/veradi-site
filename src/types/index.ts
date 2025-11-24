@@ -33,6 +33,8 @@ export type Announcement = {
   id: string;
   title: string;
   content: string;
+  category?: string | null;
+  display_order?: number | null;
   attachments: AttachmentFile[];
   created_at: string;
   updated_at: string;

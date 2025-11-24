@@ -13,11 +13,8 @@ export default function Footer() {
             <span className="hidden md:inline mx-2">|</span>
             <span className="block md:inline">대표자명: 김민지</span>
           </p>
-          <p>사업자등록번호: 123-45-67890</p>
           <p>주소: 서울특별시 강남구 언주로432 타워432 6F</p>
           <p>
-            <span className="inline-block">전화: 02-1234-5678</span>
-            <span className="hidden md:inline mx-2">|</span>
             <span className="block md:inline">이메일: veradicontents@gmail.com</span>
           </p>
         </div>

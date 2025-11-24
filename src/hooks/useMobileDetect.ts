@@ -9,9 +9,9 @@ export function useMobileDetect(breakpoint: number = 768): boolean {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     
-    let rafId2: number;
-    let rafId3: number;
-    let timer: NodeJS.Timeout;
+    let rafId2: number | null = null;
+    let rafId3: number | null = null;
+    let timer: NodeJS.Timeout | null = null;
     let checkMobile: (() => void) | null = null;
     
     // 하이드레이션 완료를 확인하기 위해 세 프레임 대기
@@ -50,8 +50,8 @@ export function useMobileDetect(breakpoint: number = 768): boolean {
 
     return () => {
       if (rafId1) cancelAnimationFrame(rafId1);
-      if (rafId2) cancelAnimationFrame(rafId2);
-      if (rafId3) cancelAnimationFrame(rafId3);
+      if (rafId2 !== null) cancelAnimationFrame(rafId2);
+      if (rafId3 !== null) cancelAnimationFrame(rafId3);
       if (timer) clearTimeout(timer);
       if (checkMobile && typeof window !== 'undefined') {
         window.removeEventListener("resize", checkMobile);

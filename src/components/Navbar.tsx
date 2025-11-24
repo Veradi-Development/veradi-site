@@ -12,7 +12,6 @@ const Navbar = memo(function Navbar() {
   const pathname = usePathname();
 
   const menuItems = [
-    { href: "/about", label: "소개" },
     { href: "/publications", label: "출판물" },
     { href: "/notice", label: "공지사항" },
     { href: "/qna", label: "Q&A" },
@@ -53,10 +52,7 @@ const Navbar = memo(function Navbar() {
   }, [handleScroll]);
 
   const isHomePage = pathname === '/';
-  const isAboutPage = pathname === '/about';
-  const isPublicationsPage = pathname === '/publications';
   const isNoticePage = pathname.startsWith('/notice');
-  const isQnaPage = pathname === '/qna';
 
   const isDark = isHomePage && navState === 'dark';
   const showDarkText = !isDark; // 어두운 섹션이 아니면 검정 텍스트
@@ -65,12 +61,12 @@ const Navbar = memo(function Navbar() {
     <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
       isHomePage 
         ? navState === 'dark' 
-          ? 'bg-black sm:bg-transparent' 
+          ? 'bg-transparent md:bg-transparent' 
           : navState === 'light-transparent'
-          ? 'bg-white sm:bg-transparent'
-          : 'bg-white'
-        : isAboutPage || isPublicationsPage || isNoticePage || isQnaPage
-        ? 'bg-white'
+          ? 'bg-transparent md:bg-transparent'
+          : 'bg-transparent md:bg-white'
+        : isNoticePage
+        ? 'bg-transparent md:bg-white'
         : 'bg-transparent'
     }`}>
       <div className="flex items-center px-4 sm:px-6 md:px-8 py-4">
@@ -150,11 +146,7 @@ const Navbar = memo(function Navbar() {
 
       {/* 모바일 메뉴 드롭다운 */}
       {isMenuOpen && (
-        <div className={`md:hidden backdrop-blur-md border-t transition-colors duration-300 ${
-          showDarkText 
-            ? 'bg-white/95 border-gray-200'
-            : 'bg-black/80 border-white/20'
-        }`}>
+        <div className="md:hidden backdrop-blur-md border-t transition-colors duration-300 bg-white/95 border-gray-200">
           <div className="px-4 py-2 space-y-1">
             {menuItems.map((item) => {
               const isActive = pathname === item.href;
@@ -163,13 +155,9 @@ const Navbar = memo(function Navbar() {
                   key={item.href}
                   href={item.href}
                   className={`block px-4 py-3 rounded-lg transition-colors font-medium ${
-                    showDarkText
-                      ? isActive
-                        ? "text-blue-600"
-                        : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                      : isActive
-                      ? "bg-white/20 text-white"
-                      : "text-white/80 hover:bg-white/10 hover:text-white"
+                    isActive
+                      ? "text-blue-600"
+                      : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                   }`}
                   onClick={() => setIsMenuOpen(false)}
                 >

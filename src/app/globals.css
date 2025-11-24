@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "GmarketSansBold";
+  src: url("/fonts/GmarketSansBold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* 하이드레이션 불일치 방지: 모바일 브라우저가 자동으로 추가하는 스타일을 명시적으로 설정 */
 html {
   -webkit-touch-callout: none;
