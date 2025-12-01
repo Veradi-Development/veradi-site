@@ -55,16 +55,12 @@ const Navbar = memo(function Navbar() {
   const isNoticePage = pathname.startsWith('/notice');
 
   const isDark = isHomePage && navState === 'dark';
-  const showDarkText = !isDark; // 어두운 섹션이 아니면 검정 텍스트
+  const showDarkText = !isHomePage && !isDark; // 메인페이지가 아니고 어두운 섹션이 아니면 검정 텍스트
 
   return (
     <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
       isHomePage 
-        ? navState === 'dark' 
-          ? 'bg-transparent md:bg-transparent' 
-          : navState === 'light-transparent'
-          ? 'bg-transparent md:bg-transparent'
-          : 'bg-transparent md:bg-white'
+        ? 'bg-transparent md:bg-transparent' // 메인페이지는 항상 투명
         : isNoticePage
         ? 'bg-transparent md:bg-white'
         : 'bg-transparent'
