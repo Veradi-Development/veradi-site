@@ -12,7 +12,7 @@ export async function GET() {
   try {
     const { data, error } = await supabase
       .from('announcements')
-      .select('*')
+      .select('id, title, category, created_at, updated_at, display_order, attachments')
       .order('created_at', { ascending: false });
 
     if (error) {
