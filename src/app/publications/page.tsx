@@ -10,10 +10,8 @@ import { useMobileDetect } from "@/hooks/useMobileDetect";
 // 교재 데이터 타입
 type BookData = {
   id: string;
-  title: string;
   subject: string;
-  main_image_url: string | null;
-  sub_image_url: string | null;
+  image_url: string | null;
   link: string;
   display_order: number;
 };
@@ -28,24 +26,20 @@ export default function Publications() {
     const fetchData = async () => {
       try {
         // 교재 로드 (type='publication')
-        const booksRes = await fetch('/api/books?type=publication');
+        const booksRes = await fetch('/api/books');
         if (booksRes.ok) {
           const booksData = await booksRes.json();
           if (Array.isArray(booksData)) {
             const books: BookData[] = booksData.map((book: {
               id: string;
-              title: string;
               subject: string;
-              main_image_url: string | null;
-              sub_image_url: string | null;
+              image_url: string | null;
               purchase_link?: string;
               display_order?: number;
             }) => ({
               id: book.id,
-              title: book.title,
               subject: book.subject,
-              main_image_url: book.main_image_url,
-              sub_image_url: book.sub_image_url,
+              image_url: book.image_url,
               link: book.purchase_link || '#',
               display_order: book.display_order || 0,
             }));
@@ -109,9 +103,9 @@ export default function Publications() {
                       className="flex w-full h-full items-center justify-center p-3 sm:p-4"
                     >
                       <div className="relative w-full h-full max-w-[92%] max-h-[92%]">
-                        {book.main_image_url ? (
+                        {book.image_url ? (
                           <Image
-                            src={book.main_image_url}
+                            src={book.image_url}
                             alt={book.subject}
                             fill
                             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 33vw, 20vw"

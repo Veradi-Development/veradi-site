@@ -2,28 +2,9 @@
 
 export type Book = {
   id: string;
-  title: string;
   subject: string;
-  description: string | null;
-  type: 'grid' | 'grid2' | 'subject' | 'publication';
-  category: string | null;
-  series: string | null;
-  main_image_url: string | null;
-  sub_image_url: string | null;
-  front_image_url: string | null;
+  image_url: string | null;
   purchase_link: string | null;
-  price: string | null;
-  display_order: number;
-  created_at: string;
-  updated_at: string;
-};
-
-export type Review = {
-  id: string;
-  name: string;
-  school: string;
-  content: string;
-  rating: number;
   display_order: number;
   created_at: string;
   updated_at: string;
@@ -47,30 +28,10 @@ export type AttachmentFile = {
   type: string;
 };
 
-export type PublicationGuide = {
-  id: string;
-  main_title: string;
-  hero_title: string;
-  video_url: string | null;
-  hero_image_url: string | null;
-};
-
-export type PublicationSection = {
-  id: string;
-  category: string;
-  title: string;
-  guide_url: string | null;
-  use_subjects_background: boolean;
-  display_order: number;
-};
-
 export type PublicationBook = {
   id: string;
-  title: string;
   subject: string;
-  category: string | null;
-  main_image_url: string | null;
-  sub_image_url: string | null;
+  image_url: string | null;
   purchase_link: string | null;
   display_order: number;
 };

@@ -8,21 +8,12 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 export const revalidate = 43200;
 
 // GET: 모든 교재 가져오기
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
-    const { searchParams } = request.nextUrl;
-    const type = searchParams.get('type'); // 'grid' 또는 'subject' 필터링
-
-    let query = supabase
+    const { data, error } = await supabase
       .from('books')
-      .select('*')
+      .select('id, subject, image_url, purchase_link, display_order, created_at, updated_at')
       .order('display_order', { ascending: true });
-
-    if (type) {
-      query = query.eq('type', type);
-    }
-
-    const { data, error } = await query;
 
     if (error) {
       console.error('Database error:', error);
@@ -44,17 +35,9 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const { 
-      title, 
       subject, 
-      description, 
-      type, 
-      category,
-      series,
-      main_image_url, 
-      sub_image_url, 
-      front_image_url, 
+      image_url, 
       purchase_link, 
-      price,
       display_order,
       password 
     } = await request.json();
@@ -65,17 +48,9 @@ export async function POST(request: NextRequest) {
     }
 
     // 필수 필드 검증
-    if (!title || !subject || !type) {
+    if (!subject) {
       return NextResponse.json(
-        { error: 'Title, subject, and type are required' },
-        { status: 400 }
-      );
-    }
-    
-    // publications 교재는 category도 필수
-    if (type === 'publication' && !category) {
-      return NextResponse.json(
-        { error: 'Category is required for publication books' },
+        { error: 'Subject is required' },
         { status: 400 }
       );
     }
@@ -83,17 +58,9 @@ export async function POST(request: NextRequest) {
     const { data, error } = await supabase
       .from('books')
       .insert([{
-        title,
         subject,
-        description,
-        type,
-        category,
-        series,
-        main_image_url,
-        sub_image_url,
-        front_image_url,
+        image_url,
         purchase_link,
-        price,
         display_order: display_order || 0,
       }])
       .select()

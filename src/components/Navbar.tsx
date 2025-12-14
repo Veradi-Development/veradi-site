@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Instagram, Menu, X } from "lucide-react";
 import { useState, useEffect, useCallback, memo } from "react";
@@ -68,11 +69,16 @@ const Navbar = memo(function Navbar() {
       <div className="flex items-center px-4 sm:px-6 md:px-8 py-4">
         {/* 로고 */}
         <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
-          <span className={`text-xl sm:text-2xl font-bold tracking-tight transition-colors duration-300 ${
-            showDarkText ? 'text-gray-900' : 'text-white drop-shadow-lg'
-          }`}>
-            VERADI
-          </span>
+          <Image 
+            src="/images/veradi-logo.png"
+            alt="VERADI"
+            width={120}
+            height={40}
+            className={`h-6 sm:h-8 w-auto transition-all duration-300 ${
+              isHomePage ? 'brightness-0 invert' : ''
+            }`}
+            priority
+          />
         </Link>
 
         {/* 빈 공간 */}
@@ -150,7 +156,7 @@ const Navbar = memo(function Navbar() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`block px-4 py-3 rounded-lg transition-colors font-medium ${
+                  className={`block px-4 py-3 rounded-lg transition-colors font-medium text-base ${
                     isActive
                       ? "text-blue-600"
                       : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"

@@ -9,7 +9,7 @@ export const revalidate = 300;
 
 // GET: 특정 교재 가져오기
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -17,7 +17,7 @@ export async function GET(
 
     const { data, error } = await supabase
       .from('books')
-      .select('*')
+      .select('id, subject, image_url, purchase_link, display_order, created_at, updated_at')
       .eq('id', id)
       .single();
 
@@ -45,17 +45,9 @@ export async function PUT(
   try {
     const { id } = await params;
     const { 
-      title, 
       subject, 
-      description, 
-      type, 
-      category,
-      series,
-      main_image_url, 
-      sub_image_url, 
-      front_image_url, 
+      image_url, 
       purchase_link, 
-      price,
       display_order,
       password 
     } = await request.json();
@@ -65,20 +57,20 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // 필수 필드 검증
+    if (!subject) {
+      return NextResponse.json(
+        { error: 'Subject is required' },
+        { status: 400 }
+      );
+    }
+
     const { data, error } = await supabase
       .from('books')
       .update({
-        title,
         subject,
-        description,
-        type,
-        category,
-        series,
-        main_image_url,
-        sub_image_url,
-        front_image_url,
+        image_url,
         purchase_link,
-        price,
         display_order,
       })
       .eq('id', id)
