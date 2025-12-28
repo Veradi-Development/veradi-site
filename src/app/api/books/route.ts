@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase';
 
 // 환경 변수에서 관리자 비밀번호 가져오기
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
@@ -8,9 +8,9 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 export const revalidate = 43200;
 
 // GET: 모든 교재 가져오기
-export async function GET(_request: NextRequest) {
+export async function GET() {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('books')
       .select('id, subject, image_url, purchase_link, display_order, created_at, updated_at')
       .order('display_order', { ascending: true });
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('books')
       .insert([{
         subject,

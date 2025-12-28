@@ -122,14 +122,19 @@ export default function Publications() {
                     </a>
 
                     {/* 오버레이 */}
-                    <div className="absolute inset-0 bg-gray-900/65 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between items-center px-5 py-6">
+                    <a
+                      href={book.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="absolute inset-0 bg-gray-900/65 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between items-center px-5 py-6 cursor-pointer"
+                    >
                       <p className="text-white text-2xl sm:text-[1.7rem] font-semibold tracking-tight text-center mt-6">
                         {book.subject}
                       </p>
                       <span className="inline-flex items-center justify-center px-8 py-3 bg-white text-gray-900 font-semibold text-base rounded-full shadow-lg mb-3">
                         구매하기
                       </span>
-                    </div>
+                    </a>
                   </div>
                 </motion.div>
                 );

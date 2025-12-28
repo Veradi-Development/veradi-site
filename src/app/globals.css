@@ -28,6 +28,15 @@ body {
 .prose img {
   max-width: 100%;
   height: auto;
+  width: auto;
+  display: block;
+}
+
+/* RichTextEditor에서 삽입된 이미지 */
+.prose img[src*="supabase.co"] {
+  max-width: 100%;
+  height: auto;
+  width: auto;
   display: block;
 }
 

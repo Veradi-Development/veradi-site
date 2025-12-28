@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase';
 
 // 환경 변수에서 관리자 비밀번호 가져오기
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
@@ -9,13 +9,13 @@ export const revalidate = 300;
 
 // GET: 특정 교재 가져오기
 export async function GET(
-  _request: NextRequest,
+  _: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('books')
       .select('id, subject, image_url, purchase_link, display_order, created_at, updated_at')
       .eq('id', id)
@@ -65,7 +65,7 @@ export async function PUT(
       );
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('books')
       .update({
         subject,
@@ -104,7 +104,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('books')
       .delete()
       .eq('id', id);

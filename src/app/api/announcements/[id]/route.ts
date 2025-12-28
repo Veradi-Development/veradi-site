@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase';
 
 // 환경 변수에서 관리자 비밀번호 가져오기
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
@@ -9,12 +9,12 @@ export const revalidate = 300;
 
 // 특정 공지사항 조회
 export async function GET(
-  request: NextRequest,
+  _: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('announcements')
       .select('*')
       .eq('id', id)
@@ -44,7 +44,7 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    const { title, content, attachments, password } = await request.json();
+    const { title, content, category, attachments, password } = await request.json();
 
     // 간단한 비밀번호 인증
     if (password !== ADMIN_PASSWORD) {
@@ -61,11 +61,12 @@ export async function PUT(
       );
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('announcements')
       .update({ 
         title, 
         content,
+        category: category || '공지사항',
         attachments: attachments || []
       })
       .eq('id', id)
@@ -92,7 +93,8 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    const { password } = await request.json();
+    const { searchParams } = request.nextUrl;
+    const password = searchParams.get('password');
 
     // 간단한 비밀번호 인증
     if (password !== ADMIN_PASSWORD) {
@@ -102,7 +104,7 @@ export async function DELETE(
       );
     }
 
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('announcements')
       .delete()
       .eq('id', id);

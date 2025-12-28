@@ -1,118 +1,132 @@
 'use client';
 
-import { useRef, useMemo, useCallback } from 'react';
-import dynamic from 'next/dynamic';
-import 'react-quill-new/dist/quill.snow.css';
-
-// React Quill을 동적으로 import (SSR 방지)
-const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
+import { useRef, useCallback } from 'react';
 
 interface RichTextEditorProps {
   value: string;
   onChange: (value: string) => void;
-  onImageUpload: (file: File) => Promise<string>;
+  onImageUpload?: (file: File) => Promise<string>;
 }
 
 export default function RichTextEditor({ value, onChange, onImageUpload }: RichTextEditorProps) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const quillRef = useRef<any>(null);
+  const editorRef = useRef<HTMLDivElement>(null);
 
-  // 이미지 핸들러
-  const imageHandler = useCallback(() => {
-    const input = document.createElement('input');
-    input.setAttribute('type', 'file');
-    input.setAttribute('accept', 'image/*');
-    input.click();
+  const handleInput = useCallback(() => {
+    if (editorRef.current) {
+      onChange(editorRef.current.innerHTML);
+    }
+  }, [onChange]);
 
-    input.onchange = async () => {
-      const file = input.files?.[0];
-      if (!file) return;
+  const handlePaste = useCallback((e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const text = e.clipboardData.getData('text/plain');
+    document.execCommand('insertText', false, text);
+  }, []);
 
+  const execCommand = useCallback((command: string, value?: string) => {
+    document.execCommand(command, false, value);
+    editorRef.current?.focus();
+    handleInput();
+  }, [handleInput]);
+
+  const handleImageUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && onImageUpload) {
       try {
-        // 이미지 업로드
-        const imageUrl = await onImageUpload(file);
-
-        // 에디터에 이미지 삽입
-        const quill = quillRef.current?.getEditor();
-        if (quill) {
-          const range = quill.getSelection();
-          quill.insertEmbed(range.index, 'image', imageUrl);
-        }
-      } catch {
-        alert('이미지 업로드에 실패했습니다.');
+        const url = await onImageUpload(file);
+        document.execCommand('insertImage', false, url);
+        handleInput();
+      } catch (error) {
+        console.error('Image upload failed:', error);
       }
-    };
-  }, [onImageUpload]);
-
-  const modules = useMemo(
-    () => ({
-      toolbar: {
-        container: [
-          [{ header: [1, 2, 3, false] }],
-          ['bold', 'italic', 'underline', 'strike'],
-          [{ list: 'ordered' }, { list: 'bullet' }],
-          [{ color: [] }, { background: [] }],
-          [{ align: [] }],
-          ['link', 'image'],
-          ['clean'],
-        ],
-        handlers: {
-          image: imageHandler,
-        },
-      },
-    }),
-    [imageHandler]
-  );
-
-  const formats = [
-    'header',
-    'bold',
-    'italic',
-    'underline',
-    'strike',
-    'list',
-    'color',
-    'background',
-    'align',
-    'link',
-    'image',
-  ];
+    }
+    e.target.value = '';
+  }, [onImageUpload, handleInput]);
 
   return (
-    <div className="rich-text-editor">
-      <ReactQuill
-        theme="snow"
-        value={value}
-        onChange={onChange}
-        modules={modules}
-        formats={formats}
-        placeholder="공지사항 내용을 입력하세요. 이미지는 툴바의 이미지 버튼을 클릭하여 삽입할 수 있습니다."
-        style={{ height: '400px', marginBottom: '60px' }}
-        // @ts-expect-error - ReactQuill ref type issue
-        ref={quillRef}
+    <div className="border border-gray-300 rounded-md">
+      <div className="border-b border-gray-300 p-2 flex gap-2 flex-wrap">
+        <button
+          type="button"
+          onClick={() => execCommand('bold')}
+          className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100"
+          title="굵게"
+        >
+          <strong>B</strong>
+        </button>
+        <button
+          type="button"
+          onClick={() => execCommand('italic')}
+          className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100"
+          title="기울임"
+        >
+          <em>I</em>
+        </button>
+        <button
+          type="button"
+          onClick={() => execCommand('underline')}
+          className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100"
+          title="밑줄"
+        >
+          <u>U</u>
+        </button>
+        <div className="border-l border-gray-300 mx-1" />
+        <button
+          type="button"
+          onClick={() => execCommand('formatBlock', 'h2')}
+          className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100"
+          title="제목"
+        >
+          H2
+        </button>
+        <button
+          type="button"
+          onClick={() => execCommand('formatBlock', 'p')}
+          className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100"
+          title="본문"
+        >
+          P
+        </button>
+        <div className="border-l border-gray-300 mx-1" />
+        <button
+          type="button"
+          onClick={() => execCommand('insertUnorderedList')}
+          className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100"
+          title="목록"
+        >
+          • 목록
+        </button>
+        <button
+          type="button"
+          onClick={() => execCommand('insertOrderedList')}
+          className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100"
+          title="번호 목록"
+        >
+          1. 목록
+        </button>
+        {onImageUpload && (
+          <>
+            <div className="border-l border-gray-300 mx-1" />
+            <label className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100 cursor-pointer">
+              이미지
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+            </label>
+          </>
+        )}
+      </div>
+      <div
+        ref={editorRef}
+        contentEditable
+        onInput={handleInput}
+        onPaste={handlePaste}
+        className="min-h-[300px] p-4 focus:outline-none"
+        dangerouslySetInnerHTML={{ __html: value }}
       />
-      <style jsx global>{`
-        .rich-text-editor .ql-editor {
-          min-height: 400px;
-          font-size: 16px;
-          line-height: 1.6;
-        }
-        .rich-text-editor .ql-toolbar {
-          border: 1px solid #d1d5db;
-          border-radius: 0.375rem 0.375rem 0 0;
-          background-color: #f9fafb;
-        }
-        .rich-text-editor .ql-container {
-          border: 1px solid #d1d5db;
-          border-top: none;
-          border-radius: 0 0 0.375rem 0.375rem;
-          font-family: inherit;
-        }
-        .rich-text-editor .ql-editor img {
-          max-width: 100%;
-          height: auto;
-        }
-      `}</style>
     </div>
   );
 }

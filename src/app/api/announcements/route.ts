@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase';
 
 // 환경 변수에서 관리자 비밀번호 가져오기
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
@@ -10,7 +10,7 @@ export const revalidate = 300;
 // 공지사항 목록 조회
 export async function GET() {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('announcements')
       .select('id, title, category, created_at, updated_at, display_order, attachments')
       .order('created_at', { ascending: false });
@@ -19,7 +19,7 @@ export async function GET() {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json(data, {
+    return NextResponse.json(data || [], {
       headers: {
         'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
       },
@@ -35,7 +35,7 @@ export async function GET() {
 // 공지사항 생성
 export async function POST(request: NextRequest) {
   try {
-    const { title, content, attachments, password } = await request.json();
+    const { title, content, category, attachments, password } = await request.json();
 
     // 간단한 비밀번호 인증
     if (password !== ADMIN_PASSWORD) {
@@ -52,11 +52,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('announcements')
       .insert([{ 
         title, 
         content,
+        category: category || '공지사항',
         attachments: attachments || []
       }])
       .select()

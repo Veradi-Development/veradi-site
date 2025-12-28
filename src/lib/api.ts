@@ -86,53 +86,12 @@ export class ApiClient {
     });
   }
 
-  // 파일 업로드 (multipart/form-data)
-  async uploadFile(file: File, password: string): Promise<{ url: string }> {
-    const formData = new FormData();
-    formData.append('file', file);
-
-    const response = await fetch(
-      `${this.baseUrl}/upload?password=${encodeURIComponent(password)}`,
-      {
-        method: 'POST',
-        body: formData,
-      }
-    );
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new ApiError(response.status, error.error || 'Upload failed');
-    }
-
-    return response.json();
-  }
-
-  // 캐시 우회 GET (Admin 페이지용)
-  async getWithoutCache<T>(endpoint: string): Promise<T> {
-    return this.get<T>(`${endpoint}?t=${Date.now()}`, {
-      cache: 'no-store',
-      headers: {
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0',
-      },
-    });
-  }
 }
 
 // 싱글톤 인스턴스
 export const apiClient = new ApiClient();
 
 // 유틸리티 함수들
-export async function verifyAdminPassword(password: string): Promise<boolean> {
-  try {
-    await apiClient.post('/auth/verify', { password });
-    return true;
-  } catch {
-    return false;
-  }
-}
-
 export function handleApiError(error: unknown): string {
   if (error instanceof ApiError) {
     return error.message;

@@ -108,11 +108,19 @@ export default function NoticePage() {
   const fetchAnnouncements = async () => {
     try {
       const response = await fetch('/api/announcements');
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
       
       // 데이터가 배열인지 확인
       if (Array.isArray(data)) {
         setAnnouncements(data);
+      } else if (data && data.error) {
+        console.error('API error:', data.error);
+        setAnnouncements([]);
       } else {
         console.error('API response is not an array:', data);
         setAnnouncements([]);

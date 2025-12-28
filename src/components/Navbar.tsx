@@ -4,12 +4,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Instagram, Menu, X } from "lucide-react";
-import { useState, useEffect, useCallback, memo } from "react";
+import { useState, memo } from "react";
 
 const Navbar = memo(function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  // 하이드레이션 불일치 방지를 위해 초기값을 고정
-  const [navState, setNavState] = useState<'dark' | 'light-transparent' | 'solid'>('dark');
   const pathname = usePathname();
 
   const menuItems = [
@@ -18,54 +16,11 @@ const Navbar = memo(function Navbar() {
     { href: "/qna", label: "Q&A" },
   ];
 
-  const handleScroll = useCallback(() => {
-    if (typeof window === 'undefined') return;
-    
-    const scrollY = window.scrollY;
-    const heroHeight = window.innerHeight;
-    const isMobile = window.innerWidth < 768;
-    const darkSectionEnd = heroHeight + (isMobile ? 1400 : 1500); // GridSeries2 끝
-    const subjectsEnd = darkSectionEnd + 1000; // Subjects 섹션
-    
-    if (scrollY < darkSectionEnd) {
-      setNavState('dark'); // 어두운 섹션: 투명 + 흰색
-    } else if (scrollY < subjectsEnd) {
-      setNavState('light-transparent'); // Subjects: 투명 + 검정
-    } else {
-      setNavState('solid'); // 나머지: 흰색 배경 + 검정
-    }
-  }, []);
-
-  useEffect(() => {
-    // 하이드레이션 완료 후 실행하여 불일치 방지
-    if (typeof window !== 'undefined') {
-      // 하이드레이션이 완전히 완료된 후 상태 업데이트 (약간의 지연)
-      const timer = setTimeout(() => {
-        handleScroll();
-      }, 100);
-      
-      window.addEventListener('scroll', handleScroll, { passive: true });
-      return () => {
-        clearTimeout(timer);
-        window.removeEventListener('scroll', handleScroll);
-      };
-    }
-  }, [handleScroll]);
-
   const isHomePage = pathname === '/';
-  const isNoticePage = pathname.startsWith('/notice');
-
-  const isDark = isHomePage && navState === 'dark';
-  const showDarkText = !isHomePage && !isDark; // 메인페이지가 아니고 어두운 섹션이 아니면 검정 텍스트
+  const showDarkText = !isHomePage; // 메인페이지가 아니면 검정 텍스트
 
   return (
-    <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-      isHomePage 
-        ? 'bg-transparent md:bg-transparent' // 메인페이지는 항상 투명
-        : isNoticePage
-        ? 'bg-transparent md:bg-white'
-        : 'bg-transparent'
-    }`}>
+    <nav className="fixed top-0 w-full z-50 transition-all duration-300 bg-transparent">
       <div className="flex items-center px-4 sm:px-6 md:px-8 py-4">
         {/* 로고 */}
         <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">

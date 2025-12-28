@@ -63,12 +63,6 @@ export default function RootLayout({
         />
         <link 
           rel="preload" 
-          href="/images/company-logo.png" 
-          as="image"
-          type="image/png"
-        />
-        <link 
-          rel="preload" 
           href="/images/veradi-logo.png" 
           as="image"
           type="image/png"

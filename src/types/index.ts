@@ -42,6 +42,3 @@ export type ApiResponse<T> = {
   error?: string;
 };
 
-// Admin 페이지 공통 타입
-export type AdminFormData = Record<string, unknown>;
-
