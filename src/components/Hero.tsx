@@ -11,73 +11,121 @@ export default function Hero() {
   });
 
   /* -----------------------------------------
+   * 히어로 섹션 총 높이: 1000vh (viewport height의 1000배)
+   * scrollYProgress는 0부터 1까지 (0 = 시작, 1 = 끝)
+   * 
+   * 각 단계별 실제 높이 (vh 기준):
+   * - 등장/퇴장 애니메이션: 각각 25vh (1000vh × 2.5% = 25vh)
+   * - 단계별 유지 구간: 60vh (1000vh × 6% = 60vh)
+   * - 각 단계 총 높이: 110vh (1000vh × 11% = 110vh)
+   * 
    * 모든 단계를 동일한 길이로 설정 (각 단계당 약 11.11%)
    * --------------------------------------- */
   
   /* -----------------------------------------
    * 1단계: 초기 화면: 좌 / 우 하단 텍스트
+   * - 등장: 0 ~ 0.025 (2.5% of scrollYProgress)
+   * - 유지: 0.025 ~ 0.085 (6% of scrollYProgress)
+   * - 퇴장: 0.085 ~ 0.11 (2.5% of scrollYProgress)
+   * - 총: 0 ~ 0.11 (11% of scrollYProgress)
    * --------------------------------------- */
-  const initialTextOpacity = useTransform(scrollYProgress, [0, 0.015, 0.095, 0.11], [1, 1, 1, 0]);
+  const initialTextOpacity = useTransform(scrollYProgress, [0, 0.025, 0.085, 0.11], [1, 1, 1, 0]);
   const initialTextY = useTransform(scrollYProgress, [0, 0.11], [0, "-20vh"]);
 
   /* -----------------------------------------
    * 2단계: VERADI MAKERS (정중앙에 등장)
+   * - 등장: 0.11 ~ 0.135 (2.5% of scrollYProgress)
+   * - 유지: 0.135 ~ 0.195 (6% of scrollYProgress)
+   * - 퇴장: 0.195 ~ 0.22 (2.5% of scrollYProgress)
+   * - 총: 0.11 ~ 0.22 (11% of scrollYProgress)
    * --------------------------------------- */
   const secondOpacity = useTransform(
     scrollYProgress,
-    [0.11, 0.125, 0.205, 0.22],
+    [0.11, 0.135, 0.195, 0.22],
     [0, 1, 1, 0]
   );
 
   const secondScale = useTransform(
     scrollYProgress,
-    [0.11, 0.125, 0.205],
+    [0.11, 0.135, 0.195],
     [1, 1.2, 1.2]
   );
 
   /* -----------------------------------------
    * 3단계: 오른쪽 하단 글자
+   * - 등장: 0.22 ~ 0.245 (2.5% of scrollYProgress)
+   * - 유지: 0.245 ~ 0.305 (6% of scrollYProgress)
+   * - 퇴장: 0.305 ~ 0.33 (2.5% of scrollYProgress)
+   * - 총: 0.22 ~ 0.33 (11% of scrollYProgress)
    * --------------------------------------- */
-  const thirdOpacity = useTransform(scrollYProgress, [0.22, 0.235, 0.315, 0.33], [0, 1, 1, 0]);
+  const thirdOpacity = useTransform(scrollYProgress, [0.22, 0.245, 0.305, 0.33], [0, 1, 1, 0]);
 
   /* -----------------------------------------
    * 3-8단계: 왼쪽 하단 VERADI MAKERS (세 번째에서 나타나 여덟 번째까지 유지)
+   * - 등장: 0.22 ~ 0.245 (2.5% of scrollYProgress)
+   * - 유지: 0.245 ~ 0.855 (61% of scrollYProgress)
+   * - 퇴장: 0.855 ~ 0.88 (2.5% of scrollYProgress)
+   * - 총: 0.22 ~ 0.88 (66% of scrollYProgress)
    * --------------------------------------- */
-  const veradiMakersOpacity = useTransform(scrollYProgress, [0.22, 0.235, 0.865, 0.88], [0, 1, 1, 0]);
+  const veradiMakersOpacity = useTransform(scrollYProgress, [0.22, 0.245, 0.855, 0.88], [0, 1, 1, 0]);
 
   /* -----------------------------------------
    * 4단계: 팀 소개 (Mathematics)
+   * - 등장: 0.33 ~ 0.355 (2.5% of scrollYProgress)
+   * - 유지: 0.355 ~ 0.415 (6% of scrollYProgress)
+   * - 퇴장: 0.415 ~ 0.44 (2.5% of scrollYProgress)
+   * - 총: 0.33 ~ 0.44 (11% of scrollYProgress)
    * --------------------------------------- */
-  const fourthOpacity = useTransform(scrollYProgress, [0.33, 0.345, 0.425, 0.44], [0, 1, 1, 0]);
+  const fourthOpacity = useTransform(scrollYProgress, [0.33, 0.355, 0.415, 0.44], [0, 1, 1, 0]);
 
   /* -----------------------------------------
    * 5단계: Physics 팀 소개
+   * - 등장: 0.44 ~ 0.465 (2.5% of scrollYProgress)
+   * - 유지: 0.465 ~ 0.525 (6% of scrollYProgress)
+   * - 퇴장: 0.525 ~ 0.55 (2.5% of scrollYProgress)
+   * - 총: 0.44 ~ 0.55 (11% of scrollYProgress)
    * --------------------------------------- */
-  const fifthOpacity = useTransform(scrollYProgress, [0.44, 0.455, 0.535, 0.55], [0, 1, 1, 0]);
+  const fifthOpacity = useTransform(scrollYProgress, [0.44, 0.465, 0.525, 0.55], [0, 1, 1, 0]);
 
   /* -----------------------------------------
    * 6단계: Chemistry 팀 소개
+   * - 등장: 0.55 ~ 0.575 (2.5% of scrollYProgress)
+   * - 유지: 0.575 ~ 0.635 (6% of scrollYProgress)
+   * - 퇴장: 0.635 ~ 0.66 (2.5% of scrollYProgress)
+   * - 총: 0.55 ~ 0.66 (11% of scrollYProgress)
    * --------------------------------------- */
-  const sixthOpacity = useTransform(scrollYProgress, [0.55, 0.565, 0.645, 0.66], [0, 1, 1, 0]);
+  const sixthOpacity = useTransform(scrollYProgress, [0.55, 0.575, 0.635, 0.66], [0, 1, 1, 0]);
 
   /* -----------------------------------------
    * 7단계: Biology 팀 소개
+   * - 등장: 0.66 ~ 0.685 (2.5% of scrollYProgress)
+   * - 유지: 0.685 ~ 0.745 (6% of scrollYProgress)
+   * - 퇴장: 0.745 ~ 0.77 (2.5% of scrollYProgress)
+   * - 총: 0.66 ~ 0.77 (11% of scrollYProgress)
    * --------------------------------------- */
-  const seventhOpacity = useTransform(scrollYProgress, [0.66, 0.675, 0.755, 0.77], [0, 1, 1, 0]);
+  const seventhOpacity = useTransform(scrollYProgress, [0.66, 0.685, 0.745, 0.77], [0, 1, 1, 0]);
 
   /* -----------------------------------------
    * 8단계: Earth science 팀 소개
+   * - 등장: 0.77 ~ 0.795 (2.5% of scrollYProgress)
+   * - 유지: 0.795 ~ 0.855 (6% of scrollYProgress)
+   * - 퇴장: 0.855 ~ 0.88 (2.5% of scrollYProgress)
+   * - 총: 0.77 ~ 0.88 (11% of scrollYProgress)
    * --------------------------------------- */
-  const eighthOpacity = useTransform(scrollYProgress, [0.77, 0.785, 0.865, 0.88], [0, 1, 1, 0]);
+  const eighthOpacity = useTransform(scrollYProgress, [0.77, 0.795, 0.855, 0.88], [0, 1, 1, 0]);
 
   /* -----------------------------------------
    * 9단계: WHO'S NEXT (가운데)
+   * - 등장: 0.88 ~ 0.905 (2.5% of scrollYProgress)
+   * - 유지: 0.905 ~ 0.965 (6% of scrollYProgress)
+   * - 퇴장: 0.965 ~ 0.99 (2.5% of scrollYProgress)
+   * - 총: 0.88 ~ 0.99 (11% of scrollYProgress)
    * --------------------------------------- */
-  const ninthOpacity = useTransform(scrollYProgress, [0.88, 0.895, 0.975, 0.99], [0, 1, 1, 0]);
-  const ninthScale = useTransform(scrollYProgress, [0.88, 0.895, 0.975], [0.8, 1, 1]);
+  const ninthOpacity = useTransform(scrollYProgress, [0.88, 0.905, 0.965, 0.99], [0, 1, 1, 0]);
+  const ninthScale = useTransform(scrollYProgress, [0.88, 0.905, 0.965], [0.8, 1, 1]);
 
   return (
-    <div ref={containerRef} className="relative h-[800vh] w-full" style={{ position: 'relative' }}>
+    <div ref={containerRef} className="relative h-[1000vh] w-full" style={{ position: 'relative' }}>
 
       {/* 배경 */}
       <div

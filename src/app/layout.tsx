@@ -75,9 +75,9 @@ export default function RootLayout({
         />
         <link 
           rel="preload" 
-          href="/images/background.png" 
+          href="/images/background.jpg" 
           as="image"
-          type="image/png"
+          type="image/jpeg"
         />
       </head>
       <body
